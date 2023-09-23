@@ -73,7 +73,7 @@ while True:
                     pixel_col = bw_face_neck[j, i]
                     if ((pixel_col < 204) & (pixel_col >= 153)):
                         # Draw the line
-                        cv2.line(white_canvas, (i, j), (i + 4, j + 4), col1, 1)
+                        cv2.line(white_canvas, (i, j), (i + 8, j + 8), col1, 1)
 
             #Add lines for more darker shades of gray
             for i in range(0, width, 6):
@@ -81,7 +81,7 @@ while True:
                     pixel_col = bw_face_neck[j, i]
                     if ((pixel_col < 153) & (pixel_col >= 102)):
                         # Draw the line
-                        cv2.line(white_canvas, (i, j), (i + 3, j + 3), col2, 1)
+                        cv2.line(white_canvas, (i, j), (i + 6, j + 6), col2, 1)
 
             #Same as above but for even more darker shades of gray
             for i in range(0, width, 4):
@@ -89,7 +89,7 @@ while True:
                     pixel_col = bw_face_neck[j, i]
                     if ((pixel_col < 102) & (pixel_col >= 51)):
                         # Draw the line
-                        cv2.line(white_canvas, (i, j), (i + 2, j + 2), col3, 1)
+                        cv2.line(white_canvas, (i, j), (i + 4, j + 4), col3, 1)
 
             #Add lines for darkest shades of gray
             for i in range(0, width, 2):
@@ -97,7 +97,7 @@ while True:
                     pixel_col = bw_face_neck[j, i]
                     if ((pixel_col < 51) & (pixel_col >= 0)):
                         # Draw the line
-                        cv2.line(white_canvas, (i, j), (i + 1, j + 1), col4, 1)
+                        cv2.line(white_canvas, (i, j), (i + 2, j + 2), col4, 1)
 
             # Paste the smaller image onto the middle of the larger canvas
             final_canvas[y:y+h, x:x+w] = white_canvas
