@@ -134,12 +134,15 @@ while True:
 
             # Paste the smaller image onto the middle of the larger canvas
             final_canvas[y:y+h, x:x+w] = white_canvas_3channel
-
+        
+        # Show the final image
         cv2.imshow('frame', final_canvas)
     else:
         cv2.imshow('frame', frame)
 
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    # Check for key events
+    key = cv2.waitKey(1)
+    if key == ord('q') or key == 27:  # 'q' or ESC key
         break
 cap.release()
 cv2.destroyAllWindows()
