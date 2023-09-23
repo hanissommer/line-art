@@ -1,0 +1,188 @@
+#This one gets frames from a live videocam feed and does not take away the background. Also make lines into colours that changes with each frame
+import cv2
+import numpy as np
+
+global col1, col2, col3, col4, col5, col6, col7, col8
+col1 = ()
+col2 = ()
+col3 = ()
+col4 = ()
+col5 = ()
+col6 = ()
+col7 = ()
+col8 = ()
+
+global colors_left
+colors_left = []
+
+colors = [(255, 105, 97), (255, 180, 128), (248, 243, 141), (66, 214, 164), (8, 202, 209), (89, 173, 246), (157, 148, 255), (199, 128, 232)]
+
+def color_generator():
+    global colors_left
+    if colors_left == []:
+        colors_left = colors.copy()  # Make a copy of the original list
+    num_left = len(colors_left)
+    colour_select = colors_left.pop(np.random.choice(num_left))  # Remove and return a random color
+    return colour_select
+
+#Open a live camera feed
+cap = cv2.VideoCapture(1)
+while True:
+    #Get the frame
+    ret, frame = cap.read()
+
+    # Get the dimensions of the frame
+    height, width, channels = frame.shape
+
+    #-----Create canvas of same dimension as image and add image to the exact place it way in image using the coordinates
+    # Define the dimensions of the white canvas
+    canvas_height, canvas_width = height, width
+
+    # Create a white canvas
+    final_canvas = np.ones((canvas_height, canvas_width, 3), dtype=np.uint8) * 255  # 3 for RGB channels
+
+    # Calculate position to place the image in the center
+    start_x = (canvas_width - width) // 1
+    start_y = (canvas_height - height) // 1
+
+    # Paste the color image onto the middle of the white canvas
+    final_canvas[start_y:start_y+height, start_x:start_x+width] = frame
+    #-----
+
+    # Convert the image to grayscale
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+
+    # Apply a face detection algorithm to get the face region
+    face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)
+
+    # # Get the coordinates of the face and neck
+    if len(faces) > 0:
+
+        for f in faces:
+            x, y, w, h = f
+            face_neck = frame[y:y+h, x:x+w]
+
+            # Convert the face + neck to black and white
+            bw_face_neck = cv2.cvtColor(face_neck, cv2.COLOR_BGR2GRAY)
+
+            height, width = bw_face_neck.shape
+
+            # Create a white canvas for the lines
+            white_canvas = np.ones((height, width, 3), dtype=np.uint8) * 255
+
+            # Add lines for lighter shades of gray
+            if col1 == (): #If col1 is not empty        
+                col1 = color_generator()
+            for i in range(0, width, 16):
+                for j in range(0, height, 16):
+                    # print(f'Pixel at ({i}, {j}): {image_canvas[j, i]}')
+                    pixel_col = bw_face_neck[j, i]
+                    if ((pixel_col < 204) & (pixel_col >= 179)):
+                        # Draw the line
+                        cv2.line(white_canvas, (i, j), (i + 8, j + 8), col1, 1)
+
+            #Add lines for little darker shades of gray
+            if col2 == (): #If col2 is not empty
+                col2 = color_generator()
+            for i in range(0, width, 14):
+                for j in range(0, height, 14):
+                    # pixel_col = rgb_to_gray(image_canvas[j, i])
+                    pixel_col = bw_face_neck[j, i]
+                    if ((pixel_col < 179) & (pixel_col >= 153)):
+                        # Draw the line
+                        cv2.line(white_canvas, (i, j), (i + 7, j + 7), col2, 1)
+
+            #Add lines for even darker shades of gray
+            if col3 == (): #If col3 is not empty
+                col3 = color_generator()
+            for i in range(0, width, 12):
+                for j in range(0, height, 12):
+                    # pixel_col = rgb_to_gray(image_canvas[j, i])
+                    pixel_col = bw_face_neck[j, i]
+                    if ((pixel_col < 153) & (pixel_col >= 128)):
+                        # Draw the line
+                        cv2.line(white_canvas, (i, j), (i + 6, j + 6), col3, 1)
+
+            #Add lines for more darker shades of gray
+            if col4 == (): #If col4 is not empty
+                col4 = color_generator()
+            for i in range(0, width, 10):
+                for j in range(0, height, 10):
+                    # pixel_col = rgb_to_gray(image_canvas[j, i])
+                    pixel_col = bw_face_neck[j, i]
+                    if ((pixel_col < 128) & (pixel_col >= 102)):
+                        # Draw the line
+                        cv2.line(white_canvas, (i, j), (i + 5, j + 5), col4, 1)
+
+
+            #Add lines for little more darker shades of gray
+            if col5 == (): #If the colour is not empty
+                col5 = color_generator()
+            for i in range(0, width, 8):
+                for j in range(0, height, 8):
+                    # pixel_col = rgb_to_gray(image_canvas[j, i])
+                    pixel_col = bw_face_neck[j, i]
+                    if ((pixel_col < 102) & (pixel_col >= 77)):
+                        # Draw the line
+                        cv2.line(white_canvas, (i, j), (i + 4, j + 4), col5, 1)
+
+            #GSame as above but for even more darker shades of gray
+            if col6 == (): #If col6 is not empty
+                col6 = color_generator()
+            for i in range(0, width, 6):
+                for j in range(0, height, 6):
+                    # pixel_col = rgb_to_gray(image_canvas[j, i])
+                    pixel_col = bw_face_neck[j, i]
+                    if ((pixel_col < 77) & (pixel_col >= 51)):
+                        # Draw the line
+                        cv2.line(white_canvas, (i, j), (i + 3, j + 3), col6, 1)
+
+            #Same as above but for even more darker shades of gray
+            if col7 == (): #If col7 is not empty
+                col7 = color_generator()
+            for i in range(0, width, 4):
+                for j in range(0, height, 4):
+                    # pixel_col = rgb_to_gray(image_canvas[j, i])
+                    pixel_col = bw_face_neck[j, i]
+                    if ((pixel_col < 51) & (pixel_col >= 26)):
+                        # Draw the line
+                        cv2.line(white_canvas, (i, j), (i + 2, j + 2), col7, 1)
+
+            #Add lines for darkest shades of gray
+            if col8 == (): #If col8 is not empty
+                col8 = color_generator()
+            for i in range(0, width, 2):
+                for j in range(0, height, 2):
+                    # pixel_col = rgb_to_gray(image_canvas[j, i])
+                    pixel_col = bw_face_neck[j, i]
+                    if ((pixel_col < 26) & (pixel_col >= 0)):
+                        # Draw the line
+                        cv2.line(white_canvas, (i, j), (i + 1, j + 1), col8, 1)
+
+            # Paste the smaller image onto the middle of the larger canvas
+            final_canvas[y:y+h, x:x+w] = white_canvas
+        
+        # Show the final image
+        cv2.imshow('frame', final_canvas)
+
+        #CHange all the cols to empty
+        col1 = ()
+        col2 = ()
+        col3 = ()
+        col4 = ()
+        col5 = ()
+        col6 = ()
+        col7 = ()
+        col8 = ()
+        colors_left = []
+    else:
+        cv2.imshow('frame', frame)
+
+    # Check for key events
+    key = cv2.waitKey(1)
+    if key == ord('q') or key == 27:  # 'q' or ESC key
+        break
+cap.release()
+cv2.destroyAllWindows()
