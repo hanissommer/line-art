@@ -7,20 +7,12 @@ col2 = ()
 col3 = ()
 col4 = ()
 
+#Holds each 4-color palatte
+colors = [[(87, 118, 158), (214, 100, 190), (223, 153, 240), (177, 145, 255)], [(222,192,95), (255, 195, 85), (43,100,173), (236, 154, 190)], [(42, 95, 50), (81, 34, 109), (83, 57, 154), (69, 116, 154)], [(243, 122, 72), (255, 103, 0), (130, 156, 165), (240, 231, 211)]]
 
-global colors_left
-colors_left = []
-
-# colors = [(255, 105, 97), (255, 180, 128), (248, 243, 141), (66, 214, 164), (8, 202, 209), (89, 173, 246), (157, 148, 255), (199, 128, 232)]
-colors = [(87, 118, 158), (214, 100, 190), (223, 153, 240), (177, 145, 255)]
 
 def color_generator():
-    global colors_left
-    if colors_left == []:
-        colors_left = colors.copy()  # Make a copy of the original list
-    num_left = len(colors_left)
-    colour_select = colors_left.pop(np.random.choice(num_left))  # Remove and return a random color
-    return colour_select
+    return colors[np.random.choice(len(colors))]
 
 #Open a live camera feed
 cap = cv2.VideoCapture(1)
@@ -58,6 +50,10 @@ while True:
     if len(faces) > 0:
 
         for f in faces:
+
+            if col1 == (): #If col2 is not empty
+                col1, col2, col3, col4 = color_generator()
+
             x, y, w, h = f
             face_neck = frame[y:y+h, x:x+w]
 
@@ -69,9 +65,7 @@ while True:
             # Create a white canvas for the lines
             white_canvas = np.ones((height, width, 3), dtype=np.uint8) * 255
 
-            #Add lines for little darker shades of gray
-            if col1 == (): #If col1 is not empty
-                col1 = color_generator()
+            #Add lines for lightest shades of gray
             for i in range(0, width, 8):
                 for j in range(0, height, 8):
                     pixel_col = bw_face_neck[j, i]
@@ -80,8 +74,6 @@ while True:
                         cv2.line(white_canvas, (i, j), (i + 4, j + 4), col1, 1)
 
             #Add lines for more darker shades of gray
-            if col2 == (): #If col2 is not empty
-                col2 = color_generator()
             for i in range(0, width, 6):
                 for j in range(0, height, 6):
                     pixel_col = bw_face_neck[j, i]
@@ -89,9 +81,7 @@ while True:
                         # Draw the line
                         cv2.line(white_canvas, (i, j), (i + 3, j + 3), col2, 1)
 
-            #GSame as above but for even more darker shades of gray
-            if col3 == (): #If col3 is not empty
-                col3 = color_generator()
+            #Same as above but for even more darker shades of gray
             for i in range(0, width, 4):
                 for j in range(0, height, 4):
                     pixel_col = bw_face_neck[j, i]
@@ -100,8 +90,6 @@ while True:
                         cv2.line(white_canvas, (i, j), (i + 2, j + 2), col3, 1)
 
             #Add lines for darkest shades of gray
-            if col4 == (): #If col4 is not empty
-                col4 = color_generator()
             for i in range(0, width, 2):
                 for j in range(0, height, 2):
                     pixel_col = bw_face_neck[j, i]
@@ -123,7 +111,6 @@ while True:
         col2 = ()
         col3 = ()
         col4 = ()
-        colors_left = []
 
 
     # Check for key events
