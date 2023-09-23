@@ -130,14 +130,14 @@ while True:
                         cv2.line(white_canvas, (i-1, j-1), (i + 1, j + 1), 0, 1)
 
 
-        white_canvas_3channel = cv2.merge((white_canvas, white_canvas, white_canvas))
+            white_canvas_3channel = cv2.merge((white_canvas, white_canvas, white_canvas))
 
-        # Paste the smaller image onto the middle of the larger canvas
-        final_canvas[y:y+h, x:x+w] = white_canvas_3channel
+            # Paste the smaller image onto the middle of the larger canvas
+            final_canvas[y:y+h, x:x+w] = white_canvas_3channel
 
         cv2.imshow('frame', final_canvas)
     else:
-        cv2.imshow('frame3', frame)
+        cv2.imshow('frame', frame)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
