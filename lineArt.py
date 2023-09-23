@@ -1,10 +1,17 @@
 #Original - 
-#This select a sprecific photo to use and takes away the background leaving just the face and neck on a canvas
+#Takes away the background leaving just the face (and neck) on a canvas
 import cv2
 import numpy as np
 
+#Open file opener
+import tkinter as tk
+from tkinter import filedialog
+root = tk.Tk()
+root.withdraw()
+file_path = filedialog.askopenfilename()
+
 # Load the image
-image = cv2.imread('IMG_1903.jpg')
+image = cv2.imread(file_path)
 
 # Get the dimensions of the image
 height, width, channels = image.shape

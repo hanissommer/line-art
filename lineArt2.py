@@ -3,9 +3,6 @@
 import cv2
 import numpy as np
 
-# Load the image
-# image = cv2.imread('IMG_1903.jpg')
-
 #Open file opener
 import tkinter as tk
 from tkinter import filedialog

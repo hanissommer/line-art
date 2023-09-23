@@ -1,19 +1,17 @@
 #Original ish - 
-#This select a sprecific photo, make that into lines, then paste it back on the og image using same coords..
+#Asks the user to choose a photo, make that into lines, then paste it back on the og image using same coords..
 import cv2
 import numpy as np
 
-# Load the image
-image = cv2.imread('IMG_1903.jpg')
-# image = cv2.imread('IMG_2966.JPG')
-# image = cv2.imread('IMG_2927.jpg')
+#Open file opener
+import tkinter as tk
+from tkinter import filedialog
+root = tk.Tk()
+root.withdraw()
+file_path = filedialog.askopenfilename()
 
-# #Open file opener
-# import tkinter as tk
-# from tkinter import filedialog
-# root = tk.Tk()
-# root.withdraw()
-# file_path = filedialog.askopenfilename()
+# Load the image
+image = cv2.imread(file_path)
 
 # Get the dimensions of the image
 height, width, channels = image.shape
