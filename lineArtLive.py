@@ -8,6 +8,7 @@ import numpy as np
 #Open a live camera feed
 cap = cv2.VideoCapture(0)
 while True:
+    #Get the frame
     ret, frame = cap.read()
 
     # Get the dimensions of the frame
@@ -28,7 +29,6 @@ while True:
     final_canvas[start_y:start_y+height, start_x:start_x+width] = frame
     #-----
 
-
     # Convert the image to grayscale
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
@@ -47,14 +47,10 @@ while True:
             # Convert the face + neck to black and white
             bw_face_neck = cv2.cvtColor(face_neck, cv2.COLOR_BGR2GRAY)
 
-            #Show the result
-            # cv2.imshow('Result', bw_face_neck)
-
             height, width = bw_face_neck.shape
 
-
             # Create a white canvas for the lines
-            white_canvas = np.ones((height, width), dtype=np.uint8) * 255
+            white_canvas = np.ones((height, width, 3), dtype=np.uint8) * 255
 
             # Add lines for lighter shades of gray
             for i in range(0, width, 8):
@@ -129,11 +125,8 @@ while True:
                         # Draw the line
                         cv2.line(white_canvas, (i-1, j-1), (i + 1, j + 1), 0, 1)
 
-
-            white_canvas_3channel = cv2.merge((white_canvas, white_canvas, white_canvas))
-
             # Paste the smaller image onto the middle of the larger canvas
-            final_canvas[y:y+h, x:x+w] = white_canvas_3channel
+            final_canvas[y:y+h, x:x+w] = white_canvas
         
         # Show the final image
         cv2.imshow('frame', final_canvas)
