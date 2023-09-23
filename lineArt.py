@@ -1,0 +1,165 @@
+#Original - 
+#This select a sprecific photo to use and takes away the background leaving just the face and neck on a canvas
+import cv2
+import numpy as np
+
+# Load the image
+image = cv2.imread('IMG_1903.jpg')
+
+# Get the dimensions of the image
+height, width, channels = image.shape
+
+# Convert the image to grayscale
+gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+
+# Apply a face detection algorithm to get the face region
+face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+faces = face_cascade.detectMultiScale(gray, scaleFactor=1.5, minNeighbors=5)
+
+# Get the coordinates of the face and neck
+x, y, w, h = faces[0]
+face_neck = image[y:y+h, x:x+w]
+
+# Convert the face + neck to black and white
+bw_face_neck = cv2.cvtColor(face_neck, cv2.COLOR_BGR2GRAY)
+
+# height, width = bw_face_neck.shape
+
+#Create a canvas of same dimension as gray and add face_neck to the exact place it way in gray using the coordinates
+# Create a white canvas
+image_canvas = np.ones((height, width), dtype=np.uint8) * 255
+
+# Paste the smaller image onto the middle of the larger canvas
+image_canvas[y:y+h, x:x+w] = bw_face_neck
+
+# Show the result
+cv2.imshow('Result11', image_canvas)
+
+# # Convert the face + neck to black and white
+# bw_face_neck = cv2.cvtColor(face_neck, cv2.COLOR_BGR2GRAY)
+
+# # height, width = bw_face_neck.shape
+
+# #Image canvas
+# image_canvas = np.ones((height + 10, width + 10), dtype=np.uint8) * 255
+
+# # Get dimensions of both images
+# height, width = bw_face_neck.shape
+# canvas_height, canvas_width = image_canvas.shape
+
+# # Calculate position to place the smaller image in the center
+# start_x = (canvas_width - width) // 2
+# start_y = (canvas_height - height) // 2
+
+# # Paste the smaller image onto the middle of the larger canvas
+# image_canvas[start_y:start_y+height, start_x:start_x+width] = bw_face_neck
+
+# #Make canvas twice as large
+# image_canvas = cv2.resize(image_canvas, (width*2, height*2), interpolation=cv2.INTER_AREA)
+
+# # Show the result
+# cv2.imshow('Result1', image_canvas)
+
+#----------------------------
+# Get the dimensions of the image
+height, width = image_canvas.shape
+
+# Create a white canvas
+white_canvas = np.ones((height, width), dtype=np.uint8) * 255
+
+# Define the angle in radians (45 degrees)
+angle_rad = np.deg2rad(45)
+
+# Define the desired length of the line
+length = 1.4142*2
+
+# Calculate the ending coordinates based on length and angle
+end_x = int(length * np.cos(angle_rad))
+end_y = int(length * np.sin(angle_rad))
+
+# Draw the line
+cv2.line(white_canvas, (0, 0), (end_x, end_y), 0, 1)
+
+# Based on bw_face_neck, use 45 degree angle lines to draw the image on the white canvas
+for i in range(10, width, 8):
+    for j in range(10, height, 8):
+        # print(f'Pixel at ({i}, {j}): {image_canvas[j, i]}')
+        pixel_col = image_canvas[j, i]
+        if ((pixel_col < 204) & (pixel_col >= 179)):
+            # Draw the line
+            cv2.line(white_canvas, (i-5, j-5), (i + 5, j + 5), 192, 1)
+
+#Going over the image and adding lines between the ones added before
+for i in range(10, width, 7):
+    for j in range(10, height, 7):
+        # pixel_col = rgb_to_gray(image_canvas[j, i])
+        pixel_col = image_canvas[j, i]
+        if ((pixel_col < 179) & (pixel_col >= 153)):
+            # Draw the line
+            cv2.line(white_canvas, (i-5, j-5), (i + 5, j + 5), 166, 1)
+
+#Going over the image and adding lines between the ones added before
+for i in range(10, width, 6):
+    for j in range(10, height, 6):
+        # pixel_col = rgb_to_gray(image_canvas[j, i])
+        pixel_col = image_canvas[j, i]
+        if ((pixel_col < 153) & (pixel_col >= 128)):
+            # Draw the line
+            cv2.line(white_canvas, (i-4, j-4), (i + 4, j + 4), 141, 1)
+
+#Going over the image and adding lines between the ones added before
+for i in range(10, width, 5):
+    for j in range(10, height, 5):
+        # pixel_col = rgb_to_gray(image_canvas[j, i])
+        pixel_col = image_canvas[j, i]
+        if ((pixel_col < 128) & (pixel_col >= 102)):
+            # Draw the line
+            cv2.line(white_canvas, (i-4, j-4), (i + 4, j + 4), 114, 1)
+
+
+#Going over the image and adding lines between the ones added before
+for i in range(10, width, 4):
+    for j in range(10, height, 4):
+        # pixel_col = rgb_to_gray(image_canvas[j, i])
+        pixel_col = image_canvas[j, i]
+        if ((pixel_col < 102) & (pixel_col >= 77)):
+            # Draw the line
+            cv2.line(white_canvas, (i-3, j-3), (i + 3, j + 3), 90, 1)
+
+#Going over the image and adding lines between the ones added before
+for i in range(10, width, 3):
+    for j in range(10, height, 3):
+        # pixel_col = rgb_to_gray(image_canvas[j, i])
+        pixel_col = image_canvas[j, i]
+        if ((pixel_col < 77) & (pixel_col >= 51)):
+            # Draw the line
+            cv2.line(white_canvas, (i-3, j-3), (i + 3, j + 3), 74, 1)
+
+#Going over the image and adding lines between the ones added before
+for i in range(10, width, 2):
+    for j in range(10, height, 2):
+        # pixel_col = rgb_to_gray(image_canvas[j, i])
+        pixel_col = image_canvas[j, i]
+        if ((pixel_col < 51) & (pixel_col >= 26)):
+            # Draw the line
+            cv2.line(white_canvas, (i-2, j-2), (i + 2, j + 2), 39, 1)
+
+#Going over the image and adding lines between the ones added before
+for i in range(1, width, 1):
+    for j in range(1, height, 1):
+        # pixel_col = rgb_to_gray(image_canvas[j, i])
+        pixel_col = image_canvas[j, i]
+        if ((pixel_col < 26) & (pixel_col >= 0)):
+            # Draw the line
+            cv2.line(white_canvas, (i-1, j-1), (i + 1, j + 1), 13, 1)
+
+
+
+# Show the result
+cv2.imshow('Result', white_canvas)
+
+#----------------------------
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
