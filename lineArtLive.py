@@ -4,9 +4,17 @@
 import cv2
 import numpy as np
 
+global steps
+steps = [
+    {'step': 8, 'color': 0, 'range': (153, 204)},
+    {'step': 6, 'color': 0, 'range': (102, 153)},
+    {'step': 4, 'color': 0, 'range': (51, 102)},
+    {'step': 2, 'color': 0, 'range': (0, 51)}
+]
+
 
 #Open a live camera feed
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 while True:
     #Get the frame
     ret, frame = cap.read()
@@ -52,41 +60,27 @@ while True:
             # Create a white canvas for the lines
             white_canvas = np.ones((height, width, 3), dtype=np.uint8) * 255
 
-            #Add lines for lightest shades of gray
-            for i in range(0, width, 8):
-                for j in range(0, height, 8):
-                    pixel_col = bw_face_neck[j, i]
-                    if ((pixel_col < 204) & (pixel_col >= 153)):
-                        # Draw the line
-                        cv2.line(white_canvas, (i-4, j-4), (i + 4, j + 4), 0, 1)
-
-            #Add lines for more darker shades of gray
-            for i in range(0, width, 6):
-                for j in range(0, height, 6):
-                    pixel_col = bw_face_neck[j, i]
-                    if ((pixel_col < 153) & (pixel_col >= 102)):
-                        # Draw the line
-                        cv2.line(white_canvas, (i-3, j-3), (i + 3, j + 3), 0, 1)
-
-            #Same as above but for even more darker shades of gray
-            for i in range(0, width, 4):
-                for j in range(0, height, 4):
-                    pixel_col = bw_face_neck[j, i]
-                    if ((pixel_col < 102) & (pixel_col >= 51)):
-                        # Draw the line
-                        cv2.line(white_canvas, (i-2, j-2), (i + 2, j + 2), 0, 1)
-
-            #Add lines for darkest shades of gray
-            for i in range(0, width, 2):
-                for j in range(0, height, 2):
-                    pixel_col = bw_face_neck[j, i]
-                    if ((pixel_col < 51) & (pixel_col >= 0)):
-                        # Draw the line
-                        cv2.line(white_canvas, (i-1, j-1), (i + 1, j + 1), 0, 1)
+            # Drawing lines based on pixel color conditions
+            for s in steps:
+                step = s['step']
+                color = s['color']
+                lower, upper = s['range']
+                
+                # Create a mask where the conditions are met
+                mask = (bw_face_neck[::step, ::step] >= lower) & (bw_face_neck[::step, ::step] < upper)
+                
+                # Get the indices where mask is True and adjust the coordinates
+                y1, x1 = np.where(mask)
+                y1 = y1 * step
+                x1 = x1 * step
+                
+                # Draw lines on the white_canvas
+                for i, j in zip(x1, y1):
+                    cv2.line(white_canvas, (i - step//2, j - step//2), (i + step//2, j + step//2), color, 1)
 
             # Paste the smaller image onto the middle of the larger canvas
             final_canvas[y:y+h, x:x+w] = white_canvas
-        
+    
         # Show the final image
         cv2.imshow('frame', final_canvas)
     else:
