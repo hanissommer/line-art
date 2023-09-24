@@ -17,6 +17,7 @@ def color_generator():
     selec = np.random.choice(len(colors))
     return colors[selec]
 
+
 col2, col4, col6, col8 = color_generator()
 
 global steps
@@ -43,6 +44,13 @@ net = cv2.dnn.readNetFromCaffe('deploy.prototxt', 'mobilenet_iter_73000.caffemod
 
 cap = cv2.VideoCapture(1)
 
+from screeninfo import get_monitors #Need pip install screeninfo
+
+# Assuming a single monitor setup
+monitor = get_monitors()[1]
+screen_width = monitor.width
+screen_height = monitor.height
+
 while True:
     ret, frame = cap.read()
     if not ret:
@@ -53,15 +61,15 @@ while True:
     net.setInput(blob)
     detections = net.forward()
 
+    col2, col4, col6, col8 = color_generator()  # For each frame, use a different set of colors
+    check_steps()
+
     final_canvas = np.ones((height, width, 3), dtype=np.uint8) * 255
 
     # Use a flag to check whether a valid human detection has occurred in the current frame
     valid_detection = False
 
     if detections is not None:
-        if col2 == (): #If col2 is empty
-            col2, col4, col6, col8 = color_generator()  # For each frame, use a different set of colors
-            check_steps()
         for f in range(detections.shape[2]):
             confidence = detections[0, 0, f, 2]
 
@@ -97,31 +105,59 @@ while True:
                             for i, j in zip(x, y):
                                 cv2.line(white_canvas, (i - step//2, j - step//2), (i + step//2, j + step//2), color, 1)
 
-                        # After processing all steps, assign white_canvas to the appropriate location on final_canvas
-                        if white_canvas.shape == final_canvas[startY:endY, startX:endX].shape:
+                        if white_canvas.shape == final_canvas[startY:endY, startX:endX].shape:  # Check if the shapes match before assignment
                             final_canvas[startY:endY, startX:endX] = white_canvas
                         else:
-                            cv2.imshow('frame', frame)
-                            col2 = ()
-                            col4 = ()
-                            col6 = ()
-                            col8 = ()
+                            height, width, _ = frame.shape  # or final_canvas.shape
+                            aspect_ratio = width / height
+                            new_width = screen_width
+                            new_height = int(screen_width / aspect_ratio)
+
+                            if new_height > screen_height:
+                                new_height = screen_height
+                                new_width = int(screen_height * aspect_ratio)
+
+                            resized_frame = cv2.resize(frame, (new_width, new_height))  # or final_canvas
+                            cv2.imshow('frame', resized_frame)
                             print(f"Shape mismatch: white_canvas: {white_canvas.shape}, final_canvas slice: {final_canvas[startY:endY, startX:endX].shape}")
                     else:
-                        cv2.imshow('frame', frame)
-                        col2 = ()
-                        col4 = ()
-                        col6 = ()
-                        col8 = ()
+                        height, width, _ = frame.shape  # or final_canvas.shape
+                        aspect_ratio = width / height
+                        new_width = screen_width
+                        new_height = int(screen_width / aspect_ratio)
+
+                        if new_height > screen_height:
+                            new_height = screen_height
+                            new_width = int(screen_height * aspect_ratio)
+
+                        resized_frame = cv2.resize(frame, (new_width, new_height))  # or final_canvas
+                        cv2.imshow('frame', resized_frame)
 
         if valid_detection:
-            cv2.imshow('frame', final_canvas)
+            # cv2.imshow('frame', final_canvas)
+            height, width, _ = frame.shape  # or final_canvas.shape
+            aspect_ratio = width / height
+            new_width = screen_width
+            new_height = int(screen_width / aspect_ratio)
+
+            if new_height > screen_height:
+                new_height = screen_height
+                new_width = int(screen_height * aspect_ratio)
+
+            resized_frame = cv2.resize(final_canvas, (new_width, new_height))  # or final_canvas
+            cv2.imshow('frame', resized_frame)
         else:
-            cv2.imshow('frame', frame)  # If no valid detection, display the original frame
-            col2 = ()
-            col4 = ()
-            col6 = ()
-            col8 = ()
+            height, width, _ = frame.shape  # or final_canvas.shape
+            aspect_ratio = width / height
+            new_width = screen_width
+            new_height = int(screen_width / aspect_ratio)
+
+            if new_height > screen_height:
+                new_height = screen_height
+                new_width = int(screen_height * aspect_ratio)
+
+            resized_frame = cv2.resize(frame, (new_width, new_height))  # or final_canvas
+            cv2.imshow('frame', resized_frame)
 
     key = cv2.waitKey(1)
     if key == ord('q') or key == 27:
