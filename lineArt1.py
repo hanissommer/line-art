@@ -58,23 +58,14 @@ for f in faces:
 
 
     # Create a white canvas for the lines
-    white_canvas = np.ones((height, width), dtype=np.uint8) * 255
+    white_canvas = np.ones((height, width, 3), dtype=np.uint8) * 255
 
     # Add lines for lighter shades of gray
     for i in range(0, width, 8):
         for j in range(0, height, 8):
             # print(f'Pixel at ({i}, {j}): {image_canvas[j, i]}')
             pixel_col = bw_face_neck[j, i]
-            if ((pixel_col < 204) & (pixel_col >= 179)):
-                # Draw the line
-                cv2.line(white_canvas, (i-5, j-5), (i + 5, j + 5), 0, 1)
-
-    #Add lines for little darker shades of gray
-    for i in range(0, width, 7):
-        for j in range(0, height, 7):
-            # pixel_col = rgb_to_gray(image_canvas[j, i])
-            pixel_col = bw_face_neck[j, i]
-            if ((pixel_col < 179) & (pixel_col >= 153)):
+            if ((pixel_col < 204) & (pixel_col >= 153)):
                 # Draw the line
                 cv2.line(white_canvas, (i-4, j-4), (i + 4, j + 4), 0, 1)
 
@@ -83,35 +74,16 @@ for f in faces:
         for j in range(0, height, 6):
             # pixel_col = rgb_to_gray(image_canvas[j, i])
             pixel_col = bw_face_neck[j, i]
-            if ((pixel_col < 153) & (pixel_col >= 128)):
+            if ((pixel_col < 153) & (pixel_col >= 102)):
                 # Draw the line
                 cv2.line(white_canvas, (i-3, j-3), (i + 3, j + 3), 0, 1)
-
-    #Add lines for more darker shades of gray
-    for i in range(0, width, 5):
-        for j in range(0, height, 5):
-            # pixel_col = rgb_to_gray(image_canvas[j, i])
-            pixel_col = bw_face_neck[j, i]
-            if ((pixel_col < 128) & (pixel_col >= 102)):
-                # Draw the line
-                cv2.line(white_canvas, (i-2, j-2), (i + 2, j + 2), 0, 1)
-
 
     #Add lines for little more darker shades of gray
     for i in range(0, width, 4):
         for j in range(0, height, 4):
             # pixel_col = rgb_to_gray(image_canvas[j, i])
             pixel_col = bw_face_neck[j, i]
-            if ((pixel_col < 102) & (pixel_col >= 77)):
-                # Draw the line
-                cv2.line(white_canvas, (i-2, j-2), (i + 2, j + 2), 0, 1)
-
-    #GSame as above but for even more darker shades of gray
-    for i in range(0, width, 3):
-        for j in range(0, height, 3):
-            # pixel_col = rgb_to_gray(image_canvas[j, i])
-            pixel_col = bw_face_neck[j, i]
-            if ((pixel_col < 77) & (pixel_col >= 51)):
+            if ((pixel_col < 102) & (pixel_col >= 51)):
                 # Draw the line
                 cv2.line(white_canvas, (i-2, j-2), (i + 2, j + 2), 0, 1)
 
@@ -120,28 +92,18 @@ for f in faces:
         for j in range(0, height, 2):
             # pixel_col = rgb_to_gray(image_canvas[j, i])
             pixel_col = bw_face_neck[j, i]
-            if ((pixel_col < 51) & (pixel_col >= 26)):
+            if ((pixel_col < 51) & (pixel_col >= 0)):
                 # Draw the line
                 cv2.line(white_canvas, (i-1, j-1), (i + 1, j + 1), 0, 1)
-
-    #Add lines for darkest shades of gray
-    for i in range(0, width, 1):
-        for j in range(0, height, 1):
-            # pixel_col = rgb_to_gray(image_canvas[j, i])
-            pixel_col = bw_face_neck[j, i]
-            if ((pixel_col < 26) & (pixel_col >= 0)):
-                # Draw the line
-                cv2.line(white_canvas, (i-1, j-1), (i + 1, j + 1), 0, 1)
-
 
 
     # Show the result
     cv2.imshow('Result11', white_canvas)
 
-    white_canvas_3channel = cv2.merge((white_canvas, white_canvas, white_canvas))
+    # white_canvas_3channel = cv2.merge((white_canvas, white_canvas, white_canvas))
 
     # Paste the smaller image onto the middle of the larger canvas
-    final_canvas[y:y+h, x:x+w] = white_canvas_3channel
+    final_canvas[y:y+h, x:x+w] = white_canvas
 
 # Show the result
 cv2.imshow('Result111', final_canvas)
