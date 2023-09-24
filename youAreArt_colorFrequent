@@ -30,53 +30,64 @@ while True:
 
     final_canvas = np.ones((height, width, 3), dtype=np.uint8) * 255
 
+    # Use a flag to check whether a valid human detection has occurred in the current frame
+    valid_detection = False
+
     if detections is not None:
         for f in range(detections.shape[2]):
             confidence = detections[0, 0, f, 2]
 
-            if confidence > 0.5:
+            if confidence > 0.6:
                 box = detections[0, 0, f, 3:7] * np.array([width, height, width, height])
                 (startX, startY, endX, endY) = box.astype("int")
+
                 if startX < endX and startY < endY:  # This checks if the bounding box is valid.
                     face_neck = frame[startY:endY, startX:endX]
+
                     if face_neck.size > 0:  # This checks if the sliced face_neck is not empty.
                         bw_face_neck = cv2.cvtColor(face_neck, cv2.COLOR_BGR2GRAY)
+                        valid_detection = True  # Set the flag to True as we have a valid detection
+
+                        height, width = bw_face_neck.shape
+                        white_canvas = np.ones((height, width, 3), dtype=np.uint8) * 255
+
+                        # Drawing lines based on pixel color conditions
+                        for i in range(0, width, 8):
+                            for j in range(0, height, 8):
+                                pixel_col = bw_face_neck[j, i]
+                                if 153 <= pixel_col < 204:
+                                    cv2.line(white_canvas, (i - 4, j - 4), (i + 4, j + 4), col2, 1)
+
+                        for i in range(0, width, 6):
+                            for j in range(0, height, 6):
+                                pixel_col = bw_face_neck[j, i]
+                                if 102 <= pixel_col < 153:
+                                    cv2.line(white_canvas, (i - 3, j - 3), (i + 3, j + 3), col4, 1)
+
+                        for i in range(0, width, 4):
+                            for j in range(0, height, 4):
+                                pixel_col = bw_face_neck[j, i]
+                                if 51 <= pixel_col < 102:
+                                    cv2.line(white_canvas, (i - 2, j - 2), (i + 2, j + 2), col6, 1)
+
+                        for i in range(0, width, 2):
+                            for j in range(0, height, 2):
+                                pixel_col = bw_face_neck[j, i]
+                                if 0 <= pixel_col < 51:
+                                    cv2.line(white_canvas, (i - 1, j - 1), (i + 1, j + 1), col8, 1)
+
+                        if white_canvas.shape == final_canvas[startY:endY, startX:endX].shape:  # Check if the shapes match before assignment
+                            final_canvas[startY:endY, startX:endX] = white_canvas
+                        else:
+                            cv2.imshow('frame', frame)
+                            print(f"Shape mismatch: white_canvas: {white_canvas.shape}, final_canvas slice: {final_canvas[startY:endY, startX:endX].shape}")
                     else:
-                        continue
+                        cv2.imshow('frame', frame)
 
-                height, width = bw_face_neck.shape
-                white_canvas = np.ones((height, width, 3), dtype=np.uint8) * 255
-
-                # Drawing lines based on pixel color conditions
-                for i in range(0, width, 8):
-                    for j in range(0, height, 8):
-                        pixel_col = bw_face_neck[j, i]
-                        if 153 <= pixel_col < 204:
-                            cv2.line(white_canvas, (i - 4, j - 4), (i + 4, j + 4), col2, 1)
-
-                for i in range(0, width, 6):
-                    for j in range(0, height, 6):
-                        pixel_col = bw_face_neck[j, i]
-                        if 102 <= pixel_col < 153:
-                            cv2.line(white_canvas, (i - 3, j - 3), (i + 3, j + 3), col4, 1)
-
-                for i in range(0, width, 4):
-                    for j in range(0, height, 4):
-                        pixel_col = bw_face_neck[j, i]
-                        if 51 <= pixel_col < 102:
-                            cv2.line(white_canvas, (i - 2, j - 2), (i + 2, j + 2), col6, 1)
-
-                for i in range(0, width, 2):
-                    for j in range(0, height, 2):
-                        pixel_col = bw_face_neck[j, i]
-                        if 0 <= pixel_col < 51:
-                            cv2.line(white_canvas, (i - 1, j - 1), (i + 1, j + 1), col8, 1)
-
-                final_canvas[startY:endY, startX:endX] = white_canvas
-
-        cv2.imshow('frame', final_canvas)
-    else:
-        cv2.imshow('frame', frame)
+        if valid_detection:
+            cv2.imshow('frame', final_canvas)
+        else:
+            cv2.imshow('frame', frame)  # If no valid detection, display the original frame
 
     key = cv2.waitKey(1)
     if key == ord('q') or key == 27:
