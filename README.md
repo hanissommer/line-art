@@ -1,9 +1,9 @@
 # line-art
-** Detecting faces (and bodies) and drawing them with lines
+ **Detecting faces (and bodies) and drawing them with lines**
 
  This is a series of programs bringing to fruition an art idea of mine -- recreating the human body/face with a meticulous orchestration of straight lines.
 
- The idea grew into the motivation of capturing and recreating the contour of our bodies through processing the different pixel regions (shades) that are cast on us as we interact with light. With precise calculations to deduce the length, color, and location of numerous straight lines, the human body becomes art.  **
+ The idea grew into the motivation of capturing and recreating the contour of our bodies through processing the different pixel regions (shades) that are cast on us as we interact with light. With precise calculations to deduce the length, color, and location of numerous straight lines, the human body becomes art.
 
  The first file, 'lineArt', started it all where the user will be prompted to select a locally stored image that the program will process. The face is identified, if any is present in the image, and based on the pixel coverage of the grayscale version of the image, the face will be reconstructed using 45-degree angled black lines, atop a white canvas. This canvas with the reconstructed face is then given as an output.
 
