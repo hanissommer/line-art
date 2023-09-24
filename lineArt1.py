@@ -52,7 +52,7 @@ for f in faces:
     bw_face_neck = cv2.cvtColor(face_neck, cv2.COLOR_BGR2GRAY)
 
     #Show the result
-    cv2.imshow('Result', bw_face_neck)
+    # cv2.imshow('Result', bw_face_neck)
 
     height, width = bw_face_neck.shape
 
@@ -98,7 +98,7 @@ for f in faces:
 
 
     # Show the result
-    cv2.imshow('Result11', white_canvas)
+    # cv2.imshow('Result11', white_canvas)
 
     # white_canvas_3channel = cv2.merge((white_canvas, white_canvas, white_canvas))
 
