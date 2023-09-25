@@ -20,14 +20,6 @@ def color_generator():
 
 col2, col4, col6, col8 = color_generator()
 
-global steps
-steps = [
-    {'step': 8, 'color': col2, 'range': (153, 204)},
-    {'step': 6, 'color': col4, 'range': (102, 153)},
-    {'step': 4, 'color': col6, 'range': (51, 102)},
-    {'step': 2, 'color': col8, 'range': (0, 51)}
-]
-
 def check_steps():
     global steps
     steps = [
@@ -36,7 +28,7 @@ def check_steps():
         {'step': 4, 'color': col6, 'range': (51, 102)},
         {'step': 2, 'color': col8, 'range': (0, 51)}
     ]
-
+check_steps()
 
 
 # Load the pre-trained model and config files
