@@ -1,91 +1,90 @@
 import cv2
 import numpy as np
-
-global steps
-steps = [
-    {'step': 8, 'color': 0, 'range': (153, 204)},
-    {'step': 6, 'color': 0, 'range': (102, 153)},
-    {'step': 4, 'color': 0, 'range': (51, 102)},
-    {'step': 2, 'color': 0, 'range': (0, 51)}
-]
+from utils import clear_colors, create_canvas, initialize_colors, get_steps
 
 
-#Open a live camera feed
-cap = cv2.VideoCapture(1)
-while True:
-    #Get the frame
-    ret, frame = cap.read()
+def run_lalbw():
+    initialize_colors()
+    clear_colors()
 
-    # Get the dimensions of the frame
-    height, width, channels = frame.shape
+    #Open a live camera feed
+    cap = cv2.VideoCapture(1)
+    while True:
+        #Get the frame
+        ret, frame = cap.read()
 
-    #-----Create canvas of same dimension as image and add image to the exact place it way in image using the coordinates
-    # Define the dimensions of the white canvas
-    canvas_height, canvas_width = height, width
+        # Get the dimensions of the frame
+        height, width, channels = frame.shape
 
-    # Create a white canvas
-    final_canvas = np.ones((canvas_height, canvas_width, 3), dtype=np.uint8) * 255  # 3 for RGB channels
+        #-----Create canvas of same dimension as image and add image to the exact place it way in image using the coordinates
+        # Define the dimensions of the white canvas
+        canvas_height, canvas_width = height, width
 
-    # Calculate position to place the image in the center
-    start_x = (canvas_width - width) // 1
-    start_y = (canvas_height - height) // 1
+        # Create a white canvas
+        final_canvas = create_canvas(canvas_height, canvas_width)
 
-    # Paste the color image onto the middle of the white canvas
-    final_canvas[start_y:start_y+height, start_x:start_x+width] = frame
-    #-----
+        # Calculate position to place the image in the center
+        start_x = (canvas_width - width) // 1
+        start_y = (canvas_height - height) // 1
 
-    # Convert the image to grayscale
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        # Paste the color image onto the middle of the white canvas
+        final_canvas[start_y:start_y+height, start_x:start_x+width] = frame
+        #-----
+
+        # Convert the image to grayscale
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
 
-    # Apply a face detection algorithm to get the face region
-    face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)
+        # Apply a face detection algorithm to get the face region
+        face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)
 
-    # # Get the coordinates of the face and neck
-    if len(faces) > 0:
+        # # Get the coordinates of the face and neck
+        if len(faces) > 0:
 
-        for f in faces:
-            x, y, w, h = f
-            face_neck = frame[y:y+h, x:x+w]
+            for f in faces:
+                x, y, w, h = f
+                face_neck = frame[y:y+h, x:x+w]
 
-            # Convert the face + neck to black and white
-            bw_face_neck = cv2.cvtColor(face_neck, cv2.COLOR_BGR2GRAY)
+                # Convert the face + neck to black and white
+                bw_face_neck = cv2.cvtColor(face_neck, cv2.COLOR_BGR2GRAY)
 
-            height, width = bw_face_neck.shape
+                height, width = bw_face_neck.shape
 
-            # Create a white canvas for the lines
-            white_canvas = np.ones((height, width, 3), dtype=np.uint8) * 255
+                # Create a white canvas for the lines
+                white_canvas = create_canvas(height, width)
 
-            # Drawing lines based on pixel color conditions
-            for s in steps:
-                step = s['step']
-                color = s['color']
-                lower, upper = s['range']
-                
-                # Create a mask where the conditions are met
-                mask = (bw_face_neck[::step, ::step] >= lower) & (bw_face_neck[::step, ::step] < upper)
-                
-                # Get the indices where mask is True and adjust the coordinates
-                y1, x1 = np.where(mask)
-                y1 = y1 * step
-                x1 = x1 * step
-                
-                # Draw lines on the white_canvas
-                for i, j in zip(x1, y1):
-                    cv2.line(white_canvas, (i - step//2, j - step//2), (i + step//2, j + step//2), color, 1)
+                # Drawing lines based on pixel color conditions
+                for s in get_steps():
+                    step = s['step']
+                    lower, upper = s['range']
+                    
+                    # Create a mask where the conditions are met
+                    mask = (bw_face_neck[::step, ::step] >= lower) & (bw_face_neck[::step, ::step] < upper)
+                    
+                    # Get the indices where mask is True and adjust the coordinates
+                    y1, x1 = np.where(mask)
+                    y1 = y1 * step
+                    x1 = x1 * step
+                    
+                    # Draw lines on the white_canvas
+                    for i, j in zip(x1, y1):
+                        cv2.line(white_canvas, (i - step//2, j - step//2), (i + step//2, j + step//2), 0, 1)
 
-            # Paste the smaller image onto the middle of the larger canvas
-            final_canvas[y:y+h, x:x+w] = white_canvas
-    
-        # Show the final image
-        cv2.imshow('frame', final_canvas)
-    else:
-        cv2.imshow('frame', frame)
+                # Paste the smaller image onto the middle of the larger canvas
+                final_canvas[y:y+h, x:x+w] = white_canvas
+        
+            # Show the final image
+            cv2.imshow('frame', final_canvas)
+        else:
+            cv2.imshow('frame', frame)
 
-    # Check for key events
-    key = cv2.waitKey(1)
-    if key == ord('q') or key == 27:  # 'q' or ESC key
-        break
-cap.release()
-cv2.destroyAllWindows()
+        # Check for key events
+        key = cv2.waitKey(1)
+        if key == ord('q') or key == 27:  # 'q' or ESC key
+            break
+    cap.release()
+    cv2.destroyAllWindows()
+
+if __name__ == '__main__':
+    run_lalbw()

@@ -4,9 +4,9 @@ from youAreArt_colorLarge import run_yarcl
 from youAreArt_colorFrequent_small import run_yarcfs
 from youAreArt_colorFrequent_large import run_yarcfl
 
-# from lineArtLive_blackWhite import run_lalbw
 from lineArtLiveChangingColor import run_lalcc
 from lineArtLiveChanging_ColorFrequent import run_lalccf
+from lineArtLive_blackWhite import run_lalbw
 
 class SimpleApp:
     def __init__(self, master):
@@ -52,6 +52,12 @@ class SimpleApp:
 
         self.button6 = tk.Button(master, text="Run LALCCF", command=run_lalccf)
         self.button6.pack(pady=(0,10))
+
+        self.label8 = tk.Label(master, text="Face detection w/ black and white", font=('Arial', 10))
+        self.label8.pack()
+
+        self.button7 = tk.Button(master, text="Run LALBW", command=run_lalbw)
+        self.button7.pack(pady=(0,10))
 
         
 
