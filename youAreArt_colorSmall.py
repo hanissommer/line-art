@@ -1,59 +1,24 @@
 import cv2
 import numpy as np
+from utils import detec_model_setup, clear_colors, create_canvas, initialize_colors, get_steps
 
-global col2, col4, col6, col8
-col2 = ()
-col4 = ()
-col6 = ()
-col8 = ()
-
-colors = [
-    [(222, 192, 95), (255, 195, 85), (43, 100, 173), (236, 154, 190)],
-    [(42, 95, 50), (81, 34, 109), (83, 57, 154), (69, 116, 154)],
-    [(255, 0, 0), (0, 255, 0), (0, 0, 255), (81, 34, 109)]
-]
-
-def color_generator():
-    selec = np.random.choice(len(colors))
-    return colors[selec]
-
-col2, col4, col6, col8 = color_generator()
-
-def check_steps():
-    global steps
-    steps = [
-        {'step': 8, 'color': col2, 'range': (153, 204)},
-        {'step': 6, 'color': col4, 'range': (102, 153)},
-        {'step': 4, 'color': col6, 'range': (51, 102)},
-        {'step': 2, 'color': col8, 'range': (0, 51)}
-    ]
-check_steps()
-
-
-# Load the pre-trained model and config files
-net = cv2.dnn.readNetFromCaffe('deploy.prototxt', 'mobilenet_iter_73000.caffemodel')
+initialize_colors()
 
 cap = cv2.VideoCapture(1)
-
 while True:
     ret, frame = cap.read()
     if not ret:
         break
 
-    height, width, channels = frame.shape
-    blob = cv2.dnn.blobFromImage(cv2.resize(frame, (300, 300)), 0.007843, (300, 300), 127.5)
-    net.setInput(blob)
-    detections = net.forward()
+    detections, height, width = detec_model_setup(frame)
 
-    final_canvas = np.ones((height, width, 3), dtype=np.uint8) * 255
+    final_canvas = create_canvas(height, width)
 
     # Use a flag to check whether a valid human detection has occurred in the current frame
     valid_detection = False
 
     if detections is not None:
-        if col2 == (): #If col2 is empty / If all previously detected faces went away
-            col2, col4, col6, col8 = color_generator()  # For each frame, use a different set of colors
-            check_steps()
+
         for f in range(detections.shape[2]):
             confidence = detections[0, 0, f, 2]
 
@@ -69,10 +34,10 @@ while True:
                         valid_detection = True  # Set the flag to True as we have a valid detection
 
                         height, width = bw_face_neck.shape
-                        white_canvas = np.ones((height, width, 3), dtype=np.uint8) * 255
+                        white_canvas = create_canvas(height, width)
 
                         # Drawing lines based on pixel color conditions
-                        for s in steps:
+                        for s in get_steps():
                             step = s['step']
                             color = s['color']
                             lower, upper = s['range']
@@ -94,26 +59,18 @@ while True:
                             final_canvas[startY:endY, startX:endX] = white_canvas
                         else:
                             cv2.imshow('frame', frame)
-                            col2 = ()
-                            col4 = ()
-                            col6 = ()
-                            col8 = ()
                             print(f"Shape mismatch: white_canvas: {white_canvas.shape}, final_canvas slice: {final_canvas[startY:endY, startX:endX].shape}")
                     else:
                         cv2.imshow('frame', frame)
-                        col2 = ()
-                        col4 = ()
-                        col6 = ()
-                        col8 = ()
 
         if valid_detection:
+            col_clear_check = False
             cv2.imshow('frame', final_canvas)
         else:
             cv2.imshow('frame', frame)  # If no valid detection, display the original frame
-            col2 = ()
-            col4 = ()
-            col6 = ()
-            col8 = ()
+            if col_clear_check == False:
+                clear_colors()
+                col_clear_check = True
 
     key = cv2.waitKey(1)
     if key == ord('q') or key == 27:
