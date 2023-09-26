@@ -100,3 +100,4 @@ def cv2_large(frame, screen_width, screen_height):
 
     resized_frame = cv2.resize(frame, (new_width, new_height))  # or final_canvas
     cv2.imshow('frame', resized_frame)
+    

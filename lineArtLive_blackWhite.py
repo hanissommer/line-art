@@ -1,6 +1,3 @@
-#You but in lines
-
-#This one gets frames from a live videocam feed and does not take away the background
 import cv2
 import numpy as np
 
