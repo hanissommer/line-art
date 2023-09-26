@@ -1,20 +1,22 @@
 import cv2
 import numpy as np
-from utils import detec_model_setup, clear_colors, create_canvas, initialize_colors, get_steps, get_monitor_details, cv2_large
+from utils import Utils
 
 def run_yarcfl():
+    utils = Utils()
+
     col_clear_check = True
     cap = cv2.VideoCapture(1)
-    screen_width, screen_height = get_monitor_details(1) # Assuming a extended/dual monitor setup
+    screen_width, screen_height = utils.get_monitor_details(1) # Assuming a extended/dual monitor setup
 
     while True:
         ret, frame = cap.read()
         if not ret:
             break
 
-        detections, height, width = detec_model_setup(frame)
-        initialize_colors()
-        final_canvas = create_canvas(height, width)
+        detections, height, width = utils.detec_model_setup(frame)
+        utils.initialize_colors()
+        final_canvas = utils.create_canvas(height, width)
 
         # Use a flag to check whether a valid human detection has occurred in the current frame
         valid_detection = False
@@ -36,10 +38,10 @@ def run_yarcfl():
                             valid_detection = True  # Set the flag to True as we have a valid detection
 
                             height, width = bw_face_neck.shape
-                            white_canvas = create_canvas(height, width)
+                            white_canvas = utils.create_canvas(height, width)
 
                             # Drawing lines based on pixel color conditions
-                            for s in get_steps():
+                            for s in utils.get_steps():
                                 step = s['step']
                                 color = s['color']
                                 lower, upper = s['range']
@@ -60,19 +62,19 @@ def run_yarcfl():
                             if white_canvas.shape == final_canvas[startY:endY, startX:endX].shape:
                                 final_canvas[startY:endY, startX:endX] = white_canvas
                             else:
-                                cv2_large(frame, screen_width, screen_height)
+                                utils.cv2_large(frame, screen_width, screen_height)
                                 print(f"Shape mismatch: white_canvas: {white_canvas.shape}, final_canvas slice: {final_canvas[startY:endY, startX:endX].shape}")
                         else:
-                            cv2_large(frame, screen_width, screen_height)
+                            utils.cv2_large(frame, screen_width, screen_height)
 
             if valid_detection:
                 col_clear_check = False
-                cv2_large(final_canvas, screen_width, screen_height)
+                utils.cv2_large(final_canvas, screen_width, screen_height)
                 
             else:
-                cv2_large(frame, screen_width, screen_height)  # If no valid detection, display the original frame
+                utils.cv2_large(frame, screen_width, screen_height)  # If no valid detection, display the original frame
                 if col_clear_check == False:
-                    clear_colors()
+                    utils.clear_colors()
                     col_clear_check = True
 
         key = cv2.waitKey(1)

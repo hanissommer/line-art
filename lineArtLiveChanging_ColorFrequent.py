@@ -1,10 +1,12 @@
 #This one gets frames from a live videocam feed and does not take away the background. Also make lines into colours that changes with each frame
 import cv2
 import numpy as np
-from utils import clear_colors, create_canvas, initialize_colors, get_steps
+from utils import Utils
 
 
 def run_lalccf():
+    utils = Utils()
+
     col_clear_check = True
     #Open a live camera feed
     cap = cv2.VideoCapture(1)
@@ -20,7 +22,7 @@ def run_lalccf():
         canvas_height, canvas_width = height, width
 
         # Create a white canvas
-        final_canvas = create_canvas(canvas_height, canvas_width)
+        final_canvas = utils.create_canvas(canvas_height, canvas_width)
 
         # Calculate position to place the image in the center
         start_x = (canvas_width - width) // 1
@@ -37,8 +39,6 @@ def run_lalccf():
         # Apply a face detection algorithm to get the face region
         face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
         faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)
-
-        initialize_colors()
 
         # # Get the coordinates of the face and neck
         if len(faces) > 0:
@@ -58,7 +58,7 @@ def run_lalccf():
 
                 # Drawing lines based on pixel color conditions
                 cntr = 4
-                for s in get_steps():
+                for s in utils.get_steps():
                     step = s['step']
                     color = s['color']
                     lower, upper = s['range']
@@ -87,7 +87,7 @@ def run_lalccf():
         else:
             cv2.imshow('frame', frame)
             if col_clear_check == False:
-                clear_colors()
+                utils.clear_colors()
                 col_clear_check = True
 
         # Check for key events

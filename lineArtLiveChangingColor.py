@@ -1,10 +1,12 @@
 import cv2
 import numpy as np
-from utils import clear_colors, create_canvas, initialize_colors, get_steps
+from utils import Utils
+
 
 
 def run_lalcc():
-    initialize_colors()
+    utils = Utils()
+
     col_clear_check = True
 
     #Open a live camera feed
@@ -21,7 +23,7 @@ def run_lalcc():
         canvas_height, canvas_width = height, width
 
         # Create a white canvas
-        final_canvas = create_canvas(canvas_height, canvas_width)
+        final_canvas = utils.create_canvas(canvas_height, canvas_width)
 
         # Calculate position to place the image in the center
         start_x = (canvas_width - width) // 1
@@ -55,7 +57,7 @@ def run_lalcc():
                 white_canvas = np.ones((height, width, 3), dtype=np.uint8) * 255
 
                 # Drawing lines based on pixel color conditions
-                for s in get_steps():
+                for s in utils.get_steps():
                     step = s['step']
                     color = s['color']
                     lower, upper = s['range']
@@ -82,7 +84,7 @@ def run_lalcc():
         else:
             cv2.imshow('frame', frame)
             if col_clear_check == False:
-                clear_colors()
+                utils.clear_colors()
                 col_clear_check = True
 
         # Check for key events

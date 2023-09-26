@@ -1,11 +1,10 @@
 import cv2
 import numpy as np
-from utils import clear_colors, create_canvas, initialize_colors, get_steps
+from utils import Utils
 
 
 def run_lalbw():
-    initialize_colors()
-    clear_colors()
+    utils = Utils()
 
     #Open a live camera feed
     cap = cv2.VideoCapture(1)
@@ -21,7 +20,7 @@ def run_lalbw():
         canvas_height, canvas_width = height, width
 
         # Create a white canvas
-        final_canvas = create_canvas(canvas_height, canvas_width)
+        final_canvas = utils.create_canvas(canvas_height, canvas_width)
 
         # Calculate position to place the image in the center
         start_x = (canvas_width - width) // 1
@@ -52,10 +51,10 @@ def run_lalbw():
                 height, width = bw_face_neck.shape
 
                 # Create a white canvas for the lines
-                white_canvas = create_canvas(height, width)
+                white_canvas = utils.create_canvas(height, width)
 
                 # Drawing lines based on pixel color conditions
-                for s in get_steps():
+                for s in utils.get_steps():
                     step = s['step']
                     lower, upper = s['range']
                     

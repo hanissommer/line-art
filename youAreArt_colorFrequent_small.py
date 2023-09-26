@@ -1,8 +1,10 @@
 import cv2
 import numpy as np
-from utils import detec_model_setup, clear_colors, create_canvas, initialize_colors, get_steps
+from utils import Utils
 
 def run_yarcfs():
+    utils = Utils()
+
     col_clear_check = True
     cap = cv2.VideoCapture(1)
     while True:
@@ -10,9 +12,9 @@ def run_yarcfs():
         if not ret:
             break
 
-        detections, height, width = detec_model_setup(frame)
-        initialize_colors()
-        final_canvas = create_canvas(height, width)
+        detections, height, width = utils.detec_model_setup(frame)
+        utils.initialize_colors()
+        final_canvas = utils.create_canvas(height, width)
 
         # Use a flag to check whether a valid human detection has occurred in the current frame
         valid_detection = False
@@ -34,10 +36,10 @@ def run_yarcfs():
                             valid_detection = True  # Set the flag to True as we have a valid detection
 
                             height, width = bw_face_neck.shape
-                            white_canvas = create_canvas(height, width)
+                            white_canvas = utils.create_canvas(height, width)
 
                             # Drawing lines based on pixel color conditions
-                            for s in get_steps():
+                            for s in utils.get_steps():
                                 step = s['step']
                                 color = s['color']
                                 lower, upper = s['range']
@@ -69,7 +71,7 @@ def run_yarcfs():
             else:
                 cv2.imshow('yarcfs', frame)  # If no valid detection, display the original frame
                 if col_clear_check == False:
-                    clear_colors()
+                    utils.clear_colors()
                     col_clear_check = True
 
         key = cv2.waitKey(1)
