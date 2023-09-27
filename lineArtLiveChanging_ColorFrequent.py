@@ -17,6 +17,8 @@ def run_lalccf():
         # Get the dimensions of the frame
         height, width, channels = frame.shape
 
+        utils.initialize_colors()
+
         #-----Create canvas of same dimension as image and add image to the exact place it way in image using the coordinates
         # Define the dimensions of the white canvas
         canvas_height, canvas_width = height, width

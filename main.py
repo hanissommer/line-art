@@ -8,6 +8,8 @@ from lineArtLiveChangingColor import run_lalcc
 from lineArtLiveChanging_ColorFrequent import run_lalccf
 from lineArtLive_blackWhite import run_lalbw
 
+from dynamic import actual_run
+
 class SimpleApp:
     def __init__(self, master):
         self.master = master
@@ -58,6 +60,16 @@ class SimpleApp:
 
         self.button7 = tk.Button(master, text="Run LALBW", command=run_lalbw)
         self.button7.pack(pady=(0,10))
+
+        #Add a separator
+        self.label5 = tk.Label(master, text="---------------------------", font=('Arial', 10))
+        self.label5.pack(pady=(10,10))
+
+        self.label9 = tk.Label(master, text="Dynamic", font=('Arial', 10))
+        self.label9.pack()
+
+        self.button8 = tk.Button(master, text="Run Dynamic", command=actual_run)
+        self.button8.pack(pady=(0,10))
 
         
 

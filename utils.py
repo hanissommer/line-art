@@ -78,4 +78,50 @@ class Utils:
 
         resized_frame = cv2.resize(frame, (new_width, new_height))  # or final_canvas
         cv2.imshow('frame', resized_frame)
+        
 
+    #Checks if the detected face is large enough
+    def face_large_enough(self, faces, frame, height, width):
+        if len(faces) == 0:
+            return False
+        
+        for f in faces:
+
+            x, y, w, h = f
+            face_neck = frame[y:y+h, x:x+w]
+
+            # Convert the face + neck to black and white
+            bw_face_neck = cv2.cvtColor(face_neck, cv2.COLOR_BGR2GRAY)
+
+            height1, width1 = bw_face_neck.shape
+
+            #If face_neck takes up a third of the frame, return yes
+            if (width1*height1) > (height*width)/20:
+                return True
+            else:
+                return False
+
+    # #A function that checks if the body detection box has moved significantly since the last frame          
+    def body_moved(self, detections, height, width, prev_box, prev_detections):
+        pixel_threshold = 10  # for example, assume 10 pixels correspond to a few millimeters
+        
+        if prev_detections is not None:
+            for f in range(detections.shape[2]):
+                if detections[0, 0, f, 2] > 0.6:
+                    box = detections[0, 0, f, 3:7] * np.array([width, height, width, height])
+                    # prev_box = prev_detections[0, 0, f, 3:7] * np.array([width, height, width, height])
+                    (startX, startY, endX, endY) = box.astype("int")
+                    (prev_startX, prev_startY, prev_endX, prev_endY) = prev_box.astype("int")
+                    
+                    # Calculating the differences in coordinates
+                    diff_startX = abs(startX - prev_startX)
+                    # diff_startY = abs(startY - prev_startY)
+                    diff_endX = abs(endX - prev_endX)
+                    # diff_endY = abs(endY - prev_endY)
+                    
+                    # Check whether the differences in any of the coordinates exceed the pixel threshold
+                    if (diff_startX > pixel_threshold  or 
+                        diff_endX > pixel_threshold):
+                        return True
+                
+        return False  # Default to return False if the conditions above are not met
