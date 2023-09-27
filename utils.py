@@ -11,6 +11,9 @@ class Utils:
         ]
         self.initialize_colors()
         self.net = cv2.dnn.readNetFromCaffe('deploy.prototxt', 'mobilenet_iter_73000.caffemodel')
+        self.cap = cv2.VideoCapture(1)
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1024)
 
     def color_generator(self):
         selec = np.random.choice(len(self.colors))
@@ -102,26 +105,48 @@ class Utils:
                 return False
 
     # #A function that checks if the body detection box has moved significantly since the last frame          
+    # def body_moved(self, detections, height, width, prev_box, prev_detections):
+    #     pixel_threshold = 10  # for example, assume 10 pixels correspond to a few millimeters
+        
+    #     if prev_detections is not None:
+    #         for f in range(detections.shape[2]):
+    #             if detections[0, 0, f, 2] > 0.6:
+    #                 box = detections[0, 0, f, 3:7] * np.array([width, height, width, height])
+    #                 # prev_box = prev_detections[0, 0, f, 3:7] * np.array([width, height, width, height])
+    #                 (startX, startY, endX, endY) = box.astype("int")
+    #                 (prev_startX, prev_startY, prev_endX, prev_endY) = prev_box.astype("int")
+                    
+    #                 # Calculating the differences in coordinates
+    #                 diff_startX = abs(startX - prev_startX)
+    #                 # diff_startY = abs(startY - prev_startY)
+    #                 diff_endX = abs(endX - prev_endX)
+    #                 # diff_endY = abs(endY - prev_endY)
+                    
+    #                 # Check whether the differences in any of the coordinates exceed the pixel threshold
+    #                 if (diff_startX > pixel_threshold  or 
+    #                     diff_endX > pixel_threshold):
+    #                     return True
+                
+    #     return False  # Default to return False if the conditions above are not met
+
     def body_moved(self, detections, height, width, prev_box, prev_detections):
-        pixel_threshold = 10  # for example, assume 10 pixels correspond to a few millimeters
+        pixel_threshold = 10  # Example threshold
         
         if prev_detections is not None:
-            for f in range(detections.shape[2]):
-                if detections[0, 0, f, 2] > 0.6:
-                    box = detections[0, 0, f, 3:7] * np.array([width, height, width, height])
-                    # prev_box = prev_detections[0, 0, f, 3:7] * np.array([width, height, width, height])
-                    (startX, startY, endX, endY) = box.astype("int")
-                    (prev_startX, prev_startY, prev_endX, prev_endY) = prev_box.astype("int")
-                    
-                    # Calculating the differences in coordinates
-                    diff_startX = abs(startX - prev_startX)
-                    # diff_startY = abs(startY - prev_startY)
-                    diff_endX = abs(endX - prev_endX)
-                    # diff_endY = abs(endY - prev_endY)
-                    
-                    # Check whether the differences in any of the coordinates exceed the pixel threshold
-                    if (diff_startX > pixel_threshold  or 
-                        diff_endX > pixel_threshold):
-                        return True
+            # Extract boxes where confidence > 0.6
+            confidences = detections[0, 0, :, 2]
+            valid_indices = np.where(confidences > 0.6)[0]
+            
+            if valid_indices.size > 0:
+                boxes = detections[0, 0, valid_indices, 3:7] * np.array([width, height, width, height])
+                boxes = boxes.astype("int")
                 
-        return False  # Default to return False if the conditions above are not met
+                # You could directly compare differences here without going element-wise, 
+                # since you're interested if any of the boxes have moved
+                diff_boxes = np.abs(boxes - prev_box)
+                
+                # Check if any of the startX or endX differences exceed the threshold
+                if np.any(diff_boxes[:, [0, 2]] > pixel_threshold):
+                    return True
+                    
+        return False  # Return False if the conditions above are not met

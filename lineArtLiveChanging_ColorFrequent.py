@@ -9,10 +9,10 @@ def run_lalccf():
 
     col_clear_check = True
     #Open a live camera feed
-    cap = cv2.VideoCapture(1)
+    # cap = cv2.VideoCapture(1)
     while True:
         #Get the frame
-        ret, frame = cap.read()
+        ret, frame = utils.cap.read()
 
         # Get the dimensions of the frame
         height, width, channels = frame.shape
@@ -95,8 +95,10 @@ def run_lalccf():
         # Check for key events
         key = cv2.waitKey(1)
         if key == ord('q') or key == 27:  # 'q' or ESC key
+            utils.cap.release()
+            cv2.destroyAllWindows()
             break
-    cap.release()
+    utils.cap.release()
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":

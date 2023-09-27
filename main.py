@@ -8,7 +8,7 @@ from lineArtLiveChangingColor import run_lalcc
 from lineArtLiveChanging_ColorFrequent import run_lalccf
 from lineArtLive_blackWhite import run_lalbw
 
-from dynamic import actual_run
+from dynamic_2 import actual_run
 
 class SimpleApp:
     def __init__(self, master):

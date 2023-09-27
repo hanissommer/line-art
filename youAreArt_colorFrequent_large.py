@@ -6,11 +6,11 @@ def run_yarcfl():
     utils = Utils()
 
     col_clear_check = True
-    cap = cv2.VideoCapture(1)
+    # cap = cv2.VideoCapture(1)
     screen_width, screen_height = utils.get_monitor_details(1) # Assuming a extended/dual monitor setup
 
     while True:
-        ret, frame = cap.read()
+        ret, frame = utils.cap.read()
         if not ret:
             break
 
@@ -79,9 +79,11 @@ def run_yarcfl():
 
         key = cv2.waitKey(1)
         if key == ord('q') or key == 27:
+            utils.cap.release()
+            cv2.destroyAllWindows()
             break
 
-    cap.release()
+    utils.cap.release()
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
