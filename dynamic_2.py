@@ -6,24 +6,24 @@ from utils import Utils
 class DynamicRunner:
     def __init__(self):
         self.utils = Utils()
-        self.screen_width, self.screen_height = self.utils.get_monitor_details(1)
-        # self.cap = cv2.VideoCapture(1)
-        # self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-        # self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1024)
-
+        # print(self.utils.screen_height, self.utils.screen_width)
         self.col_clear_check = True
         self.prev_box = None
         self.prev_detection = None
+        self.curr_f = None
         self.valid_face_takeover = False
         self.face_cascade = CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
         
         
     def release_resources(self):
-        self.cap.release()
+        self.utils.cap.release()
         cv2.destroyAllWindows()
 
 
-    def draw_lines(self, bw_face_neck, white_canvas, step, color, lower, upper):
+    def draw_lines(self, bw_face_neck, white_canvas, s):
+        step = s['step']
+        color = s['color']
+        lower, upper = s['range']
         mask = (bw_face_neck[::step, ::step] >= lower) & (bw_face_neck[::step, ::step] < upper)
         y, x = np.where(mask)
         y = y * step
@@ -34,67 +34,57 @@ class DynamicRunner:
 
     def draw_body_detections(self, frame):
         detections, height, width = self.utils.detec_model_setup(frame)
-        final_canvas = self.utils.create_canvas(height, width)
 
-        # Use a flag to check whether a valid human detection has occurred in the current frame
+        if len(detections) == 0:  # early return if detections is None or empty
+            print("No detections")
+            return
+
+        final_canvas = self.utils.create_canvas(height, width)
         valid_detection = False
 
-        if detections is not None:
+        for f in range(detections.shape[2]):
+            confidence = detections[0, 0, f, 2]
+            if confidence <= 0.5:
+                continue
 
-            for f in range(detections.shape[2]):
-                confidence = detections[0, 0, f, 2]
+            box = detections[0, 0, f, 3:7] * np.array([width, height, width, height])
+            (startX, startY, endX, endY) = box.astype("int")
+            
+            if startX >= endX or startY >= endY:
+                continue  # skip to the next iteration
 
-                if confidence > 0.6:
-                    box = detections[0, 0, f, 3:7] * np.array([width, height, width, height])
-                    (startX, startY, endX, endY) = box.astype("int")
+            human_body = frame[startY:endY, startX:endX]
+            if human_body.size <= 0:
+                continue
+            
+            bw_human_body = cv2.cvtColor(human_body, cv2.COLOR_BGR2GRAY)
+            valid_detection = True  # valid detection
 
-                    if startX < endX and startY < endY:  # This checks if the bounding box is valid.
-                        face_neck = frame[startY:endY, startX:endX]
+            new_height, new_width = bw_human_body.shape
+            white_canvas = self.utils.create_canvas(new_height, new_width)
 
-                        if face_neck.size > 0:  # This checks if the sliced face_neck is not empty.
-                            bw_face_neck = cv2.cvtColor(face_neck, cv2.COLOR_BGR2GRAY)
-                            valid_detection = True  # Set the flag to True as we have a valid detection
+            self.curr_f = f
+            col_change = self.utils.body_moved(detections, height, width, self.prev_box, self.prev_detection, self.curr_f)
 
-                            new_height, new_width = bw_face_neck.shape
-                            white_canvas = self.utils.create_canvas(new_height, new_width)
+            if col_change:
+                self.utils.initialize_colors()
 
-                            col_change = self.utils.body_moved(detections, height, width, self.prev_box, self.prev_detection)
+            for s in self.utils.get_steps_dynamic():
+                self.draw_lines(bw_human_body, white_canvas, s)
+            
+            if white_canvas.shape != final_canvas[startY:endY, startX:endX].shape:
+                print(f"Shape mismatch: white_canvas: {white_canvas.shape}, final_canvas slice: {final_canvas[startY:endY, startX:endX].shape}")
+                continue
+            
+            final_canvas[startY:endY, startX:endX] = white_canvas
+            self.col_clear_check = False
+            self.utils.cv2_large(final_canvas, self.utils.screen_width, self.utils.screen_height)
 
-                            if col_change is True:
-                                self.utils.initialize_colors()
+            self.prev_box = box
+            self.prev_detection = detections
 
-                            # Drawing lines based on pixel color conditions
-                            for s in self.utils.get_steps():
-                                step = s['step']
-                                color = s['color']
-                                lower, upper = s['range']
-                                
-                                self.draw_lines(bw_face_neck, white_canvas, step, color, lower, upper)
-
-                            # After processing all steps, assign white_canvas to the appropriate location on final_canvas
-                            if white_canvas.shape == final_canvas[startY:endY, startX:endX].shape:
-                                final_canvas[startY:endY, startX:endX] = white_canvas
-                            else:
-                                self.utils.cv2_large(frame, self.screen_width, self.screen_height)
-                                print(f"Shape mismatch: white_canvas: {white_canvas.shape}, final_canvas slice: {final_canvas[startY:endY, startX:endX].shape}")
-                        
-                            self.prev_box = box
-                            self.prev_detection = detections
-                        
-                        else:
-                            self.utils.cv2_large(frame, self.screen_width, self.screen_height)
-
-
-            if valid_detection:
-                self.col_clear_check = False
-                # self.prev_detection = detections
-                self.utils.cv2_large(final_canvas, self.screen_width, self.screen_height)
-                
-            else:
-                self.utils.cv2_large(frame, self.screen_width, self.screen_height)  # If no valid detection, display the original frame
-                if self.col_clear_check == False:
-                    self.utils.clear_colors()
-                    self.col_clear_check = True
+        if not valid_detection:
+            self.utils.cv2_large(frame, self.utils.screen_width, self.utils.screen_height)
 
     
 
