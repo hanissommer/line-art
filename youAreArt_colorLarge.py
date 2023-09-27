@@ -7,7 +7,7 @@ def run_yarcl():
     utils = Utils()
 
     # cap = cv2.VideoCapture(1)
-    screen_width, screen_height = utils.get_monitor_details(1) # Assuming a extended/dual monitor setup
+    # screen_width, screen_height = utils.get_monitor_details(1) # Assuming a extended/dual monitor setup
 
     while True:
         ret, frame = utils.cap.read()
@@ -62,17 +62,17 @@ def run_yarcl():
                             if white_canvas.shape == final_canvas[startY:endY, startX:endX].shape:
                                 final_canvas[startY:endY, startX:endX] = white_canvas
                             else:
-                                utils.cv2_large(frame, screen_width, screen_height)
+                                utils.cv2_large(frame, utils.screen_width, utils.screen_height)
                                 print(f"Shape mismatch: white_canvas: {white_canvas.shape}, final_canvas slice: {final_canvas[startY:endY, startX:endX].shape}")
                         else:
-                            utils.cv2_large(frame, screen_width, screen_height)
+                            utils.cv2_large(frame, utils.screen_width, utils.screen_height)
 
             if valid_detection:
                 col_clear_check = False
-                utils.cv2_large(final_canvas, screen_width, screen_height)
+                utils.cv2_large(final_canvas, utils.screen_width, utils.screen_height)
                 
             else:
-                utils.cv2_large(frame, screen_width, screen_height)  # If no valid detection, display the original frame
+                utils.cv2_large(frame, utils.screen_width, utils.screen_height)  # If no valid detection, display the original frame
                 if col_clear_check == False:
                     utils.clear_colors()
                     col_clear_check = True

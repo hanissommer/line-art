@@ -122,7 +122,7 @@ class Utils:
 
     # #A function that checks if the body detection box has moved significantly since the last frame          
     def body_moved(self, detections, height, width, prev_box, prev_detections, curr_f):
-        pixel_threshold = 20  # Example threshold
+        pixel_threshold = 25  # Example threshold
         
         if prev_detections is not None:
             boxes = detections[0, 0, curr_f, 3:7] * np.array([width, height, width, height])
