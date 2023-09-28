@@ -114,8 +114,8 @@ class Utils:
 
             height1, width1 = bw_face_neck.shape
 
-            #If face_neck takes up a third of the frame, return yes
-            if (width1*height1) > (height*width)/20:
+            #If face_neck takes up 1/30 of the frame, return True
+            if (width1*height1) > (height*width)/30:
                 return True
             else:
                 return False

@@ -69,7 +69,7 @@ class DynamicRunner1:
             bw_human_body = cv2.cvtColor(human_body, cv2.COLOR_BGR2GRAY)
 
             # Apply a face detection algorithm to get the face region
-            faces = self.face_cascade.detectMultiScale(bw_human_body, scaleFactor=1.1, minNeighbors=5)
+            faces = self.face_cascade.detectMultiScale(bw_human_body, scaleFactor=1.5, minNeighbors=5)
             self.valid_face_takeover = self.utils.face_large_enough(faces, frame, height, width)
 
             valid_detection = True  # valid detection
@@ -107,7 +107,7 @@ class DynamicRunner1:
         final_canvas[:height, :width] = frame
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-        faces = self.face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)
+        faces = self.face_cascade.detectMultiScale(gray, scaleFactor=1.5, minNeighbors=5)
         self.valid_face_takeover = self.utils.face_large_enough(faces, frame, height, width)
         if len(faces) == 0:
             self.utils.cv2_large(frame, self.utils.screen_width, self.utils.screen_height)
