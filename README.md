@@ -7,5 +7,7 @@
 
  Run 'main.py', which has an interface to all the other (updated and stable) scripts.
 
+ Note: In the initialization of utils.py, you may need to tweak the monitor/camera source number, and cap resolution to get best result
+
   
 
