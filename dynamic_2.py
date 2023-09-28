@@ -24,13 +24,23 @@ class DynamicRunner:
         step = s['step']
         color = s['color']
         lower, upper = s['range']
+        half_step = step // 2
+
         mask = (bw_face_neck[::step, ::step] >= lower) & (bw_face_neck[::step, ::step] < upper)
         y, x = np.where(mask)
         y = y * step
         x = x * step
-        for i, j in zip(x, y):
-            line(white_canvas, (i - step // 2, j - step // 2), (i + step // 2, j + step // 2), color, 1)
-    
+
+        num_lines = len(x)
+        points = np.zeros((num_lines, 2, 2), dtype=np.int32)
+
+        points[:, 0, 0] = x - half_step
+        points[:, 0, 1] = y - half_step
+        points[:, 1, 0] = x + half_step
+        points[:, 1, 1] = y + half_step
+
+        cv2.polylines(white_canvas, points, isClosed=False, color=color, thickness=1)
+
 
     def draw_body_detections(self, frame):
         detections, height, width = self.utils.detec_model_setup(frame)
