@@ -8,6 +8,7 @@ from lineArtLiveChangingColor import run_lalcc
 from lineArtLiveChanging_ColorFrequent import run_lalccf
 from lineArtLive_blackWhite import run_lalbw
 
+from dynamic import actual_run1
 from dynamic_2 import actual_run
 
 class SimpleApp:
@@ -62,14 +63,20 @@ class SimpleApp:
         self.button7.pack(pady=(0,10))
 
         #Add a separator
-        self.label5 = tk.Label(master, text="---------------------------", font=('Arial', 10))
-        self.label5.pack(pady=(10,10))
+        self.label9 = tk.Label(master, text="---------------------------", font=('Arial', 10))
+        self.label9.pack(pady=(10,10))
 
-        self.label9 = tk.Label(master, text="Dynamic", font=('Arial', 10))
-        self.label9.pack()
+        self.label10 = tk.Label(master, text="Dynamic V2 w/ face and body detection", font=('Arial', 10))
+        self.label10.pack()
 
-        self.button8 = tk.Button(master, text="Run Dynamic", command=actual_run)
+        self.button8 = tk.Button(master, text="Run Dynamic V2", command=actual_run1)
         self.button8.pack(pady=(0,10))
+
+        self.label11 = tk.Label(master, text="Dynamic w/ body detection", font=('Arial', 10))
+        self.label11.pack()
+
+        self.button9 = tk.Button(master, text="Run Dynamic", command=actual_run)
+        self.button9.pack(pady=(0,10))
 
         
 

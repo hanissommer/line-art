@@ -54,7 +54,7 @@ class DynamicRunner:
 
         for f in range(detections.shape[2]):
             confidence = detections[0, 0, f, 2]
-            if confidence <= 0.5:
+            if confidence <= 0.6:
                 continue
 
             box = detections[0, 0, f, 3:7] * np.array([width, height, width, height])
