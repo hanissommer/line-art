@@ -11,18 +11,18 @@ class Utils:
         ]
         self.initialize_colors()
         self.net = cv2.dnn.readNetFromCaffe('deploy.prototxt', 'mobilenet_iter_73000.caffemodel')
-        # self.cap = cv2.VideoCapture(1)
-        self.cap = cv2.VideoCapture(1, cv2.CAP_DSHOW)
-        self.screen_width, self.screen_height = self.get_monitor_details(0)
-        self.choose_best_resolution()
 
-        # self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-        # self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1024) 
+        self.cap = cv2.VideoCapture(1, cv2.CAP_DSHOW)
+        self.screen_width, self.screen_height = self.get_monitor_details(0) #Chooses the first monitor
+        self.choose_best_resolution() #Sets the resolution of the output to the monitor resolution 
+
+        # self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280) #HD
+        # self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720) 
         
-        # self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920) #FHD - doesnt work
+        # self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920) #FHD 
         # self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 
-        # self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 2560) #QHD - too good
+        # self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 2560) #QHD 
         # self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1440)
 
     #Chooses output resolution based on monitor spec
