@@ -2,12 +2,29 @@ import cv2
 import numpy as np
 from utils import Utils
 
-def run_yarcl():
-    col_clear_check = True
-    utils = Utils()
+def draw_lines(bw_face_neck, white_canvas, s):
+        step = s['step']
+        color = s['color']
+        lower, upper = s['range']
+        half_step = step // 2
 
-    # cap = cv2.VideoCapture(1)
-    # screen_width, screen_height = utils.get_monitor_details(1) # Assuming a extended/dual monitor setup
+        mask = (bw_face_neck[::step, ::step] >= lower) & (bw_face_neck[::step, ::step] < upper)
+        y, x = np.where(mask)
+        y = y * step
+        x = x * step
+
+        num_lines = len(x)
+        points = np.zeros((num_lines, 2, 2), dtype=np.int32)
+
+        points[:, 0, 0] = x - half_step
+        points[:, 0, 1] = y - half_step
+        points[:, 1, 0] = x + half_step
+        points[:, 1, 1] = y + half_step
+
+        cv2.polylines(white_canvas, points, isClosed=False, color=color, thickness=1)
+
+def run_yarcl():
+    utils = Utils()
 
     while True:
         ret, frame = utils.cap.read()
@@ -15,67 +32,50 @@ def run_yarcl():
             break
 
         detections, height, width = utils.detec_model_setup(frame)
+        if len(detections) == 0:  # early return if detections is None or empty
+            print("No detections")
+            return
 
         final_canvas = utils.create_canvas(height, width)
-
-        # Use a flag to check whether a valid human detection has occurred in the current frame
         valid_detection = False
 
-        if detections is not None:
+        for f in range(detections.shape[2]):
+            confidence = detections[0, 0, f, 2]
+            if confidence <= 0.6:
+                continue
 
-            for f in range(detections.shape[2]):
-                confidence = detections[0, 0, f, 2]
+            box = detections[0, 0, f, 3:7] * np.array([width, height, width, height])
+            (startX, startY, endX, endY) = box.astype("int")
+            
+            if startX >= endX or startY >= endY:
+                continue  # skip to the next iteration
 
-                if confidence > 0.6:
-                    box = detections[0, 0, f, 3:7] * np.array([width, height, width, height])
-                    (startX, startY, endX, endY) = box.astype("int")
+            human_body = frame[startY:endY, startX:endX]
+            if human_body.size <= 0:
+                continue
+            
+            bw_human_body = cv2.cvtColor(human_body, cv2.COLOR_BGR2GRAY)
 
-                    if startX < endX and startY < endY:  # This checks if the bounding box is valid.
-                        face_neck = frame[startY:endY, startX:endX]
+            valid_detection = True  # valid detection
 
-                        if face_neck.size > 0:  # This checks if the sliced face_neck is not empty.
-                            bw_face_neck = cv2.cvtColor(face_neck, cv2.COLOR_BGR2GRAY)
-                            valid_detection = True  # Set the flag to True as we have a valid detection
+            new_height, new_width = bw_human_body.shape
+            white_canvas = utils.create_canvas(new_height, new_width)
 
-                            height, width = bw_face_neck.shape
-                            white_canvas = utils.create_canvas(height, width)
+            for s in utils.get_steps():
+                draw_lines(bw_human_body, white_canvas, s)
+            
+            if white_canvas.shape != final_canvas[startY:endY, startX:endX].shape:
+                print(f"Shape mismatch: white_canvas: {white_canvas.shape}, final_canvas slice: {final_canvas[startY:endY, startX:endX].shape}")
+                continue
+            
+            final_canvas[startY:endY, startX:endX] = white_canvas
 
-                            # Drawing lines based on pixel color conditions
-                            for s in utils.get_steps():
-                                step = s['step']
-                                color = s['color']
-                                lower, upper = s['range']
-                                
-                                # Create a mask where the conditions are met
-                                mask = (bw_face_neck[::step, ::step] >= lower) & (bw_face_neck[::step, ::step] < upper)
-                                
-                                # Get the indices where mask is True and adjust the coordinates
-                                y, x = np.where(mask)
-                                y = y * step
-                                x = x * step
-                                
-                                # Draw lines on the white_canvas
-                                for i, j in zip(x, y):
-                                    cv2.line(white_canvas, (i - step//2, j - step//2), (i + step//2, j + step//2), color, 1)
+            utils.cv2_large(final_canvas, utils.screen_width, utils.screen_height)
 
-                            # After processing all steps, assign white_canvas to the appropriate location on final_canvas
-                            if white_canvas.shape == final_canvas[startY:endY, startX:endX].shape:
-                                final_canvas[startY:endY, startX:endX] = white_canvas
-                            else:
-                                utils.cv2_large(frame, utils.screen_width, utils.screen_height)
-                                print(f"Shape mismatch: white_canvas: {white_canvas.shape}, final_canvas slice: {final_canvas[startY:endY, startX:endX].shape}")
-                        else:
-                            utils.cv2_large(frame, utils.screen_width, utils.screen_height)
 
-            if valid_detection:
-                col_clear_check = False
-                utils.cv2_large(final_canvas, utils.screen_width, utils.screen_height)
-                
-            else:
-                utils.cv2_large(frame, utils.screen_width, utils.screen_height)  # If no valid detection, display the original frame
-                if col_clear_check == False:
-                    utils.clear_colors()
-                    col_clear_check = True
+        if not valid_detection:
+            utils.initialize_colors()
+            utils.cv2_large(frame, utils.screen_width, utils.screen_height)
 
         key = cv2.waitKey(1)
         if key == ord('q') or key == 27:
@@ -86,5 +86,5 @@ def run_yarcl():
     utils.cap.release()
     cv2.destroyAllWindows()
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     run_yarcl()

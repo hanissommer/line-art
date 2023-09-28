@@ -14,13 +14,13 @@ from dynamic_2 import actual_run
 class SimpleApp:
     def __init__(self, master):
         self.master = master
-        master.title('You are the Art')
+        master.title('Choose a program to run')
         
-        self.label1 = tk.Label(master, text="Body detection w/ color change per detection (s)", font=('Arial', 10))
-        self.label1.pack()
+        # self.label1 = tk.Label(master, text="Body detection w/ color change per detection (s)", font=('Arial', 10))
+        # self.label1.pack()
         
-        self.button1 = tk.Button(master, text="Run YARCS", command=run_yarcs)
-        self.button1.pack(pady=(0,10))
+        # self.button1 = tk.Button(master, text="Run YARCS", command=run_yarcs)
+        # self.button1.pack(pady=(0,10))
         
         self.label2 = tk.Label(master, text="Body detection w/ color change per detection (l)", font=('Arial', 10))
         self.label2.pack()
@@ -28,11 +28,11 @@ class SimpleApp:
         self.button2 = tk.Button(master, text="Run YARCL", command=run_yarcl)
         self.button2.pack(pady=(0,10))
         
-        self.label3 = tk.Label(master, text="Body detection w/ color change per frame (s)", font=('Arial', 10))
-        self.label3.pack()
+        # self.label3 = tk.Label(master, text="Body detection w/ color change per frame (s)", font=('Arial', 10))
+        # self.label3.pack()
         
-        self.button3 = tk.Button(master, text="Run YARCFS", command=run_yarcfs)
-        self.button3.pack(pady=(0,10))
+        # self.button3 = tk.Button(master, text="Run YARCFS", command=run_yarcfs)
+        # self.button3.pack(pady=(0,10))
         
         self.label4 = tk.Label(master, text="Body detection w/ color change per frame (l)", font=('Arial', 10))
         self.label4.pack()
