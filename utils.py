@@ -41,10 +41,24 @@ class Utils:
         self.check_steps()
 
     def check_steps(self):
-        self.steps = [
-            {'step': 8, 'color': self.col2, 'range': (153, 204)},
-            {'step': 6, 'color': self.col4, 'range': (102, 153)},
-            {'step': 4, 'color': self.col6, 'range': (51, 102)},
+        # self.steps = [
+        #     {'step': 8, 'color': self.col2, 'range': (153, 204)},
+        #     {'step': 6, 'color': self.col4, 'range': (102, 153)},
+        #     {'step': 4, 'color': self.col6, 'range': (51, 102)},
+        #     {'step': 2, 'color': self.col8, 'range': (0, 51)}
+        # ]
+
+        # self.steps = [ #More defined lines
+        #     {'step': 10, 'color': self.col2, 'range': (153, 204)},
+        #     {'step': 8, 'color': self.col4, 'range': (102, 153)},
+        #     {'step': 6, 'color': self.col6, 'range': (51, 102)},
+        #     {'step': 4, 'color': self.col8, 'range': (0, 51)}
+        # ]
+
+        self.steps = [ #Even more defined lines
+            {'step': 16, 'color': self.col2, 'range': (153, 204)},
+            {'step': 12, 'color': self.col4, 'range': (102, 153)},
+            {'step': 6, 'color': self.col6, 'range': (51, 102)},
             {'step': 2, 'color': self.col8, 'range': (0, 51)}
         ]
 
