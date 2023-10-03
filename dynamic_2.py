@@ -1,3 +1,5 @@
+#Does not switch to face detection if face is too small
+
 import cv2
 from cv2 import CascadeClassifier, COLOR_BGR2GRAY, line, imshow, waitKey, destroyAllWindows  # More specific imports
 import numpy as np
@@ -12,7 +14,6 @@ class DynamicRunner:
         self.prev_detection = None
         self.curr_f = None
         self.valid_face_takeover = False
-        self.face_cascade = CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
         
         
     def release_resources(self):

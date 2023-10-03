@@ -1,3 +1,5 @@
+#Changes to face detection when face gets close to camera but doesnt change resolution
+
 import cv2
 from cv2 import CascadeClassifier, COLOR_BGR2GRAY, line, imshow, waitKey, destroyAllWindows  # More specific imports
 import numpy as np
