@@ -12,8 +12,9 @@ class Utils:
         self.initialize_colors()
         self.net = cv2.dnn.readNetFromCaffe('deploy.prototxt', 'mobilenet_iter_73000.caffemodel')
 
-        self.cap = cv2.VideoCapture(1, cv2.CAP_DSHOW)
-        self.screen_width, self.screen_height = self.get_monitor_details(0) #Chooses the first monitor
+        # self.cap = cv2.VideoCapture(0, cv2.CAP_DSHOW) #Webcam
+        self.cap = cv2.VideoCapture(1, cv2.CAP_MSMF) #Webcam
+        self.screen_width, self.screen_height = self.get_monitor_details(1) #Chooses the first monitor
         self.choose_best_resolution() #Sets the resolution of the output to the monitor resolution 
 
         # self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280) #HD
@@ -90,7 +91,7 @@ class Utils:
 
     #Create a white canvas
     def create_canvas(self, height, width):
-        return np.ones((height, width, 3), dtype=np.uint8) * 255
+        return np.ones((height, width, 3), dtype=np.uint8) * 200
 
 
     #Gets the details of the display
@@ -139,14 +140,12 @@ class Utils:
             else:
                 return False
 
+
     # #A function that checks if the body detection box has moved significantly since the last frame          
-    def body_moved(self, detections, height, width, prev_box, prev_detections, curr_f):
+    def body_moved(self, boxes, prev_detections, prev_box):
         pixel_threshold = 25  # Example threshold
         
         if prev_detections is not None:
-            boxes = detections[0, 0, curr_f, 3:7] * np.array([width, height, width, height])
-            boxes = boxes.astype("int")
-
             diff_boxes = np.abs(boxes - prev_box)
             
             # Check if any of the startX or endX differences exceed the threshold

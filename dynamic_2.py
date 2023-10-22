@@ -10,10 +10,8 @@ class DynamicRunner:
         self.utils = Utils()
         # print(self.utils.screen_height, self.utils.screen_width)
         self.col_clear_check = True
-        self.prev_box = None
-        self.prev_detection = None
-        self.curr_f = None
         self.valid_face_takeover = False
+        self.f_dict = {}
         
         
     def release_resources(self):
@@ -45,6 +43,7 @@ class DynamicRunner:
 
     def draw_body_detections(self, frame):
         detections, height, width = self.utils.detec_model_setup(frame)
+        steps = self.utils.steps
 
         if len(detections) == 0:  # early return if detections is None or empty
             print("No detections")
@@ -54,6 +53,7 @@ class DynamicRunner:
         valid_detection = False
 
         for f in range(detections.shape[2]):
+            
             confidence = detections[0, 0, f, 2]
             if confidence <= 0.6:
                 continue
@@ -73,16 +73,21 @@ class DynamicRunner:
 
             new_height, new_width = bw_human_body.shape
             white_canvas = self.utils.create_canvas(new_height, new_width)
-
-            self.curr_f = f
-            col_change = self.utils.body_moved(detections, height, width, self.prev_box, self.prev_detection, self.curr_f)
-
-            if col_change:
-                self.utils.initialize_colors()
-
-            for s in self.utils.get_steps_dynamic():
-                self.draw_lines(bw_human_body, white_canvas, s)
             
+            f_exists = f in self.f_dict
+            if f_exists:
+                col_change = self.utils.body_moved(box, *self.f_dict[f][:2])
+
+                if col_change:
+                    self.utils.initialize_colors()
+                    steps = self.utils.get_steps()
+
+                for s in self.f_dict[f][2]:
+                    self.draw_lines(bw_human_body, white_canvas, s)
+            else:
+                for s in self.utils.get_steps_dynamic():
+                    self.draw_lines(bw_human_body, white_canvas, s)
+ 
             if white_canvas.shape != final_canvas[startY:endY, startX:endX].shape:
                 print(f"Shape mismatch: white_canvas: {white_canvas.shape}, final_canvas slice: {final_canvas[startY:endY, startX:endX].shape}")
                 continue
@@ -91,11 +96,16 @@ class DynamicRunner:
             self.col_clear_check = False
             self.utils.cv2_large(final_canvas, self.utils.screen_width, self.utils.screen_height)
 
-            self.prev_box = box
-            self.prev_detection = detections
+            # steps = self.utils.steps
+            self.f_dict[f] = [detections, box, steps]
+
 
         if not valid_detection:
             self.utils.cv2_large(frame, self.utils.screen_width, self.utils.screen_height)
+            # self.f_dict = {}
+            self.col_clear_check = True
+            if self.col_clear_check:
+                self.utils.initialize_colors()
 
     
 
@@ -109,6 +119,7 @@ class DynamicRunner:
             ret, frame = self.utils.cap.read()
             if not ret:
                 break
+
             self.process_frame(frame)
             key = cv2.waitKey(1)
             if key == ord('q') or key == 27:

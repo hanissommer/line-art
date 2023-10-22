@@ -11,8 +11,9 @@ class Utils:
         ]
         self.initialize_colors()
         self.net = cv2.dnn.readNetFromCaffe('deploy.prototxt', 'mobilenet_iter_73000.caffemodel')
-        self.cap = cv2.VideoCapture(1, cv2.CAP_DSHOW)
-        self.screen_width, self.screen_height = self.get_monitor_details(0)
+        # self.cap = cv2.VideoCapture(1, cv2.CAP_DSHOW)
+        self.cap = cv2.VideoCapture(1, cv2.CAP_MSMF) #Webcam
+        self.screen_width, self.screen_height = self.get_monitor_details(1)
         self.res_change = False
         self.big_screen = False
         self.choose_best_resolution()
