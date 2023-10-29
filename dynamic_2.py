@@ -79,11 +79,14 @@ class DynamicRunner:
                 if col_change:
                     self.utils.initialize_colors()
                     steps = self.utils.get_steps()
+                    self.f_dict[f] = [detections, box, steps]
 
                 for s in self.f_dict[f][2]:
                     self.draw_lines(bw_human_body, white_canvas, s)
             else:
-                for s in self.utils.get_steps_dynamic():
+                steps = self.utils.get_steps()
+                self.f_dict[f] = [detections, box, steps]
+                for s in self.f_dict[f][2]:
                     self.draw_lines(bw_human_body, white_canvas, s)
  
             if white_canvas.shape != final_canvas[startY:endY, startX:endX].shape:
@@ -94,11 +97,9 @@ class DynamicRunner:
             self.col_clear_check = False
             self.utils.cv2_large(final_canvas, self.utils.screen_width, self.utils.screen_height)
 
-            self.f_dict[f] = [detections, box, steps]
-
-
         if not valid_detection:
             self.utils.cv2_large(frame, self.utils.screen_width, self.utils.screen_height)
+            # self.f_dict = {}
             self.col_clear_check = True
             if self.col_clear_check:
                 self.utils.initialize_colors()

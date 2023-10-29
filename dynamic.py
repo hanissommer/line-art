@@ -70,10 +70,6 @@ class DynamicRunner1:
             
             bw_human_body = cv2.cvtColor(human_body, cv2.COLOR_BGR2GRAY)
             valid_detection = True  # valid detection
-            
-             # Apply a face detection algorithm to get the face region
-            faces = self.face_cascade.detectMultiScale(bw_human_body, scaleFactor=1.5, minNeighbors=5)
-            self.valid_face_takeover = self.utils.face_large_enough(faces, frame, height, width)
 
             new_height, new_width = bw_human_body.shape
             white_canvas = self.utils.create_canvas(new_height, new_width)
@@ -85,11 +81,14 @@ class DynamicRunner1:
                 if col_change:
                     self.utils.initialize_colors()
                     steps = self.utils.get_steps()
+                    self.f_dict[f] = [detections, box, steps]
 
                 for s in self.f_dict[f][2]:
                     self.draw_lines(bw_human_body, white_canvas, s)
             else:
-                for s in self.utils.get_steps_dynamic():
+                steps = self.utils.get_steps()
+                self.f_dict[f] = [detections, box, steps]
+                for s in self.f_dict[f][2]:
                     self.draw_lines(bw_human_body, white_canvas, s)
  
             if white_canvas.shape != final_canvas[startY:endY, startX:endX].shape:
@@ -100,11 +99,9 @@ class DynamicRunner1:
             self.col_clear_check = False
             self.utils.cv2_large(final_canvas, self.utils.screen_width, self.utils.screen_height)
 
-            self.f_dict[f] = [detections, box, steps]
-
-
         if not valid_detection:
             self.utils.cv2_large(frame, self.utils.screen_width, self.utils.screen_height)
+            # self.f_dict = {}
             self.col_clear_check = True
             if self.col_clear_check:
                 self.utils.initialize_colors()
