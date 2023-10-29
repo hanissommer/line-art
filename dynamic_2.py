@@ -8,9 +8,7 @@ from utils import Utils
 class DynamicRunner:
     def __init__(self):
         self.utils = Utils()
-        # print(self.utils.screen_height, self.utils.screen_width)
         self.col_clear_check = True
-        self.valid_face_takeover = False
         self.f_dict = {}
         
         
@@ -96,13 +94,11 @@ class DynamicRunner:
             self.col_clear_check = False
             self.utils.cv2_large(final_canvas, self.utils.screen_width, self.utils.screen_height)
 
-            # steps = self.utils.steps
             self.f_dict[f] = [detections, box, steps]
 
 
         if not valid_detection:
             self.utils.cv2_large(frame, self.utils.screen_width, self.utils.screen_height)
-            # self.f_dict = {}
             self.col_clear_check = True
             if self.col_clear_check:
                 self.utils.initialize_colors()

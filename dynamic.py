@@ -9,11 +9,9 @@ class DynamicRunner1:
     def __init__(self):
         self.utils = Utils()
         self.col_clear_check = True
-        self.prev_box = None
-        self.prev_detection = None
-        self.curr_f = None
         self.valid_face_takeover = False
         self.face_cascade = CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+        self.f_dict = {}
         
         
     def release_resources(self):
@@ -45,6 +43,7 @@ class DynamicRunner1:
 
     def draw_body_detections(self, frame):
         detections, height, width = self.utils.detec_model_setup(frame)
+        steps = self.utils.steps
 
         if len(detections) == 0:  # early return if detections is None or empty
             print("No detections")
@@ -54,6 +53,7 @@ class DynamicRunner1:
         valid_detection = False
 
         for f in range(detections.shape[2]):
+            
             confidence = detections[0, 0, f, 2]
             if confidence <= 0.6:
                 continue
@@ -69,25 +69,29 @@ class DynamicRunner1:
                 continue
             
             bw_human_body = cv2.cvtColor(human_body, cv2.COLOR_BGR2GRAY)
-
-            # Apply a face detection algorithm to get the face region
+            valid_detection = True  # valid detection
+            
+             # Apply a face detection algorithm to get the face region
             faces = self.face_cascade.detectMultiScale(bw_human_body, scaleFactor=1.5, minNeighbors=5)
             self.valid_face_takeover = self.utils.face_large_enough(faces, frame, height, width)
 
-            valid_detection = True  # valid detection
-
             new_height, new_width = bw_human_body.shape
             white_canvas = self.utils.create_canvas(new_height, new_width)
-
-            self.curr_f = f
-            col_change = self.utils.body_moved(detections, height, width, self.prev_box, self.prev_detection, self.curr_f)
-
-            if col_change:
-                self.utils.initialize_colors()
-
-            for s in self.utils.get_steps_dynamic():
-                self.draw_lines(bw_human_body, white_canvas, s)
             
+            f_exists = f in self.f_dict
+            if f_exists:
+                col_change = self.utils.body_moved(box, *self.f_dict[f][:2])
+
+                if col_change:
+                    self.utils.initialize_colors()
+                    steps = self.utils.get_steps()
+
+                for s in self.f_dict[f][2]:
+                    self.draw_lines(bw_human_body, white_canvas, s)
+            else:
+                for s in self.utils.get_steps_dynamic():
+                    self.draw_lines(bw_human_body, white_canvas, s)
+ 
             if white_canvas.shape != final_canvas[startY:endY, startX:endX].shape:
                 print(f"Shape mismatch: white_canvas: {white_canvas.shape}, final_canvas slice: {final_canvas[startY:endY, startX:endX].shape}")
                 continue
@@ -96,12 +100,14 @@ class DynamicRunner1:
             self.col_clear_check = False
             self.utils.cv2_large(final_canvas, self.utils.screen_width, self.utils.screen_height)
 
-            self.prev_box = box
-            self.prev_detection = detections
+            self.f_dict[f] = [detections, box, steps]
+
 
         if not valid_detection:
             self.utils.cv2_large(frame, self.utils.screen_width, self.utils.screen_height)
-
+            self.col_clear_check = True
+            if self.col_clear_check:
+                self.utils.initialize_colors()
 
     def draw_face_detections(self, frame):
         height, width, channels = frame.shape

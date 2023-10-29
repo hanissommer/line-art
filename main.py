@@ -66,10 +66,10 @@ class SimpleApp:
         self.label9 = tk.Label(master, text="---------------------------", font=('Arial', 10))
         self.label9.pack(pady=(10,10))
 
-        self.label10 = tk.Label(master, text="Dynamic V2 w/ face and body detection", font=('Arial', 10))
-        self.label10.pack()
+        # self.label10 = tk.Label(master, text="Dynamic V2 w/ face and body detection", font=('Arial', 10))
+        # self.label10.pack()
 
-        self.button8 = tk.Button(master, text="Run Dynamic V2", command=actual_run1)
+        # self.button8 = tk.Button(master, text="Run Dynamic V2", command=actual_run1)
         self.button8.pack(pady=(0,10))
 
         self.label11 = tk.Label(master, text="Dynamic w/ body detection", font=('Arial', 10))
