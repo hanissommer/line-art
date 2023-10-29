@@ -70,6 +70,10 @@ class DynamicRunner1:
             
             bw_human_body = cv2.cvtColor(human_body, cv2.COLOR_BGR2GRAY)
             valid_detection = True  # valid detection
+            
+             # Apply a face detection algorithm to get the face region
+            faces = self.face_cascade.detectMultiScale(bw_human_body, scaleFactor=1.5, minNeighbors=5)
+            self.valid_face_takeover = self.utils.face_large_enough(faces, frame, height, width)
 
             new_height, new_width = bw_human_body.shape
             white_canvas = self.utils.create_canvas(new_height, new_width)
@@ -124,7 +128,7 @@ class DynamicRunner1:
             bw_face_neck = gray[y:y+h, x:x+w]  # reusing the already converted gray image
             white_canvas = np.ones((h, w, 3), dtype=np.uint8) * 255
               
-            for s in self.utils.get_steps():
+            for s in self.utils.get_steps_1():
                 self.draw_lines(bw_face_neck, white_canvas, s)
                 
             final_canvas[y:y+h, x:x+w] = white_canvas

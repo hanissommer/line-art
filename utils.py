@@ -63,9 +63,23 @@ class Utils:
             {'step': 2, 'color': self.col8, 'range': (0, 51)}
         ]
 
+    def check_steps_1(self):
+        self.steps = [
+            {'step': 8, 'color': self.col2, 'range': (153, 204)},
+            {'step': 6, 'color': self.col4, 'range': (102, 153)},
+            {'step': 4, 'color': self.col6, 'range': (51, 102)},
+            {'step': 2, 'color': self.col8, 'range': (0, 51)}
+        ]
+
     #Gets the details for the steps for line drawing
     def get_steps(self):
         self.check_steps()
+        return self.steps
+    
+    
+    #Gets the details for the steps for line drawing -- for face only in dynamic.py
+    def get_steps_1(self):
+        self.check_steps_1()
         return self.steps
     
     #Gets the details for the steps for line drawing
