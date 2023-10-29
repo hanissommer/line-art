@@ -70,7 +70,7 @@ class SimpleApp:
         # self.label10.pack()
 
         # self.button8 = tk.Button(master, text="Run Dynamic V2", command=actual_run1)
-        self.button8.pack(pady=(0,10))
+        # self.button8.pack(pady=(0,10))
 
         self.label11 = tk.Label(master, text="Dynamic w/ body detection", font=('Arial', 10))
         self.label11.pack()

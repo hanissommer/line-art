@@ -166,13 +166,10 @@ class Utils:
                 self.res_change = False
 
     # #A function that checks if the body detection box has moved significantly since the last frame          
-    def body_moved(self, detections, height, width, prev_box, prev_detections, curr_f):
+    def body_moved(self, boxes, prev_detections, prev_box):
         pixel_threshold = 25  # Example threshold
         
         if prev_detections is not None:
-            boxes = detections[0, 0, curr_f, 3:7] * np.array([width, height, width, height])
-            boxes = boxes.astype("int")
-
             diff_boxes = np.abs(boxes - prev_box)
             
             # Check if any of the startX or endX differences exceed the threshold
